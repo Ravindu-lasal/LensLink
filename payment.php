@@ -19,61 +19,9 @@
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between">
-                <div class="flex space-x-7">
-                    <div>
-                        <!-- Logo -->
-                        <a href="index.html" class="flex items-center py-4 px-2">
-                            <span class="font-semibold text-gray-900 text-2xl">
-                                <i class="fas fa-camera-retro mr-2 text-blue-600"></i>LensLink
-                            </span>
-                        </a>
-                    </div>
-                    <!-- Primary Navbar items -->
-                    <div class="hidden md:flex items-center space-x-1">
-                        <a href="index.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Home</a>
-                        <a href="gallery.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Gallery</a>
-                        <a href="favorites.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Favorites</a>
-                        <a href="payment.html" class="py-4 px-2 text-blue-600 border-b-4 border-blue-600">Cart</a>
-                    </div>
-                </div>
-                <!-- Secondary Navbar items -->
-                <div class="hidden md:flex items-center space-x-3">
-                    <a href="signin.html" class="py-2 px-2 font-medium text-gray-700 hover:text-blue-600 transition duration-300">Sign In</a>
-                    <a href="signup.html" class="py-2 px-2 font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition duration-300">Sign Up</a>
-                </div>
-                <!-- Mobile menu button -->
-                <div class="md:hidden flex items-center">
-                    <button class="outline-none mobile-menu-button">
-                        <svg class="w-6 h-6 text-gray-700 hover:text-blue-600"
-                            x-show="!showMenu"
-                            fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile menu -->
-        <div class="hidden mobile-menu">
-            <ul class="">
-                <li><a href="index.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Home</a></li>
-                <li><a href="gallery.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Gallery</a></li>
-                <li><a href="favorites.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Favorites</a></li>
-                <li class="active"><a href="payment.html" class="block text-sm px-2 py-4 text-white bg-blue-600 font-semibold">Payments</a></li>
-                <li><a href="signin.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign In</a></li>
-                <li><a href="signup.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign Up</a></li>
-            </ul>
-        </div>
-    </nav>
+    <?php
+       include('includes/navigation.php');
+     ?>
 
     <!-- Payment Page Content -->
     <div class="container mx-auto px-4 py-8">
@@ -355,54 +303,9 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4"><i class="fas fa-camera-retro mr-2"></i>PhotoArt</h3>
-                    <p class="text-gray-400">Sell and buy high-quality photos from professional photographers around the world.</p>
-                    <div class="flex mt-4 space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-pinterest"></i></a>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="index.html" class="text-gray-400 hover:text-white transition">Home</a></li>
-                        <li><a href="gallery.html" class="text-gray-400 hover:text-white transition">Gallery</a></li>
-                        <li><a href="favorites.html" class="text-gray-400 hover:text-white transition">Favorites</a></li>
-                        <li><a href="payment.html" class="text-gray-400 hover:text-white transition">Cart</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Categories</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Nature</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Portrait</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Travel</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Architecture</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Wildlife</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
-                    <p class="text-gray-400 mb-4">Subscribe to our newsletter for updates and promotions.</p>
-                    <div class="flex">
-                        <input type="email" placeholder="Your email" class="px-4 py-2 w-full rounded-l focus:outline-none text-gray-900">
-                        <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2023 PhotoArt. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <?php
+     include 'includes/footer.php';
+    ?>
 
     <script>
         // Mobile menu toggle

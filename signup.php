@@ -1,3 +1,42 @@
+<?php
+require_once 'config/db_conn.php';
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Sanitize and collect form input
+    $firstName = trim($_POST["first-name"]);
+    $lastName = trim($_POST["last-name"]);
+    $email = trim($_POST["email"]);
+    $password = $_POST["password"];
+    $confirmPassword = $_POST["confirm-password"];
+    $role = $_POST["role"];
+
+    // Combine first and last name
+    $fullName = $firstName . ' ' . $lastName;
+
+    // Validate passwords match
+    if ($password !== $confirmPassword) {
+        die("Passwords do not match.");
+    }
+    // Hash password
+    $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+    // Insert into DB
+    $stmt = $conn->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $fullName, $email, $passwordHash, $role);
+
+    if ($stmt->execute()) {
+        echo "<script>alert('User created successfully'); window.location.href = 'signin.php';</script>";
+        exit;
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
+    $conn->close();
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,61 +48,9 @@
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between">
-                <div class="flex space-x-7">
-                    <div>
-                        <!-- Logo -->
-                        <a href="index.html" class="flex items-center py-4 px-2">
-                            <span class="font-semibold text-gray-900 text-2xl">
-                                <i class="fas fa-camera-retro mr-2 text-blue-600"></i>LensLink
-                            </span>
-                        </a>
-                    </div>
-                    <!-- Primary Navbar items -->
-                    <div class="hidden md:flex items-center space-x-1">
-                        <a href="index.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Home</a>
-                        <a href="gallery.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Gallery</a>
-                        <a href="favorites.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Favorites</a>
-                        <a href="payment.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Cart</a>
-                    </div>
-                </div>
-                <!-- Secondary Navbar items -->
-                <div class="hidden md:flex items-center space-x-3">
-                    <a href="signin.html" class="py-2 px-2 font-medium text-gray-700 hover:text-blue-600 transition duration-300">Sign In</a>
-                    <a href="signup.html" class="py-2 px-2 font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition duration-300 border-b-2 border-blue-600">Sign Up</a>
-                </div>
-                <!-- Mobile menu button -->
-                <div class="md:hidden flex items-center">
-                    <button class="outline-none mobile-menu-button">
-                        <svg class="w-6 h-6 text-gray-700 hover:text-blue-600"
-                            x-show="!showMenu"
-                            fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile menu -->
-        <div class="hidden mobile-menu">
-            <ul class="">
-                <li><a href="index.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Home</a></li>
-                <li><a href="gallery.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Gallery</a></li>
-                <li><a href="favorites.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Favorites</a></li>
-                <li><a href="payment.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Payments</a></li>
-                <li><a href="signin.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign In</a></li>
-                <li class="active"><a href="signup.html" class="block text-sm px-2 py-4 text-white bg-blue-600 font-semibold">Sign Up</a></li>
-            </ul>
-        </div>
-    </nav>
+    <?php
+     include 'includes/navigation.php';
+    ?>
 
     <!-- Sign Up Form -->
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -79,7 +66,7 @@
                     </a>
                 </p>
             </div>
-            <form class="mt-8 space-y-6" action="#" method="POST">
+            <form class="mt-8 space-y-6" action="signup.php" method="POST">
                 <div class="rounded-md shadow-sm space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -112,6 +99,13 @@
                         <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required
                             class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                             placeholder="Confirm Password">
+                    </div>
+                    <div class="mt-4">
+                        <label for="role" class="block text-sm text-gray-700 mb-2">Choose your role</label>
+                        <select id="role" name="role" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="seller">Seller</option>
+                            <option value="buyer">Buyer</option>
+                        </select>
                     </div>
                 </div>
 
@@ -169,56 +163,11 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4"><i class="fas fa-camera-retro mr-2"></i>LensLink</h3>
-                    <p class="text-gray-400">Sell and buy high-quality photos from professional photographers around the world.</p>
-                    <div class="flex mt-4 space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-pinterest"></i></a>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="index.html" class="text-gray-400 hover:text-white transition">Home</a></li>
-                        <li><a href="gallery.html" class="text-gray-400 hover:text-white transition">Gallery</a></li>
-                        <li><a href="favorites.html" class="text-gray-400 hover:text-white transition">Favorites</a></li>
-                        <li><a href="payment.html" class="text-gray-400 hover:text-white transition">Cart</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Categories</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Nature</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Portrait</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Travel</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Architecture</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Wildlife</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
-                    <p class="text-gray-400 mb-4">Subscribe to our newsletter for updates and promotions.</p>
-                    <div class="flex">
-                        <input type="email" placeholder="Your email" class="px-4 py-2 w-full rounded-l focus:outline-none text-gray-900">
-                        <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2023 LensLink. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <?php
+     include 'includes/footer.php';
+    ?>
 
-    <script>
+      <script>
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
@@ -230,7 +179,6 @@
         // Form validation
         const form = document.querySelector('form');
         form.addEventListener('submit', function(e) {
-            e.preventDefault();
             const firstName = document.getElementById('first-name').value;
             const lastName = document.getElementById('last-name').value;
             const email = document.getElementById('email-address').value;
@@ -240,25 +188,23 @@
             
             // Simple validation
             if (!firstName || !lastName || !email || !password || !confirmPassword) {
+                e.preventDefault();
                 alert('Please fill in all fields');
                 return;
             }
             
             if (password !== confirmPassword) {
+                e.preventDefault();
                 alert('Passwords do not match');
                 return;
             }
             
             if (!terms) {
+                e.preventDefault();
                 alert('You must agree to the terms and conditions');
                 return;
             }
             
-            // Here you would typically send the data to your server
-            console.log('Signing up with:', { firstName, lastName, email, password });
-            
-            // For demo purposes, redirect to home page
-            window.location.href = 'index.html';
         });
     </script>
 </body>
