@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoArt - Payment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom styles */
+        .card-input:focus + .card-icon {
+            color: #3b82f6;
+        }
+        .payment-method:checked + .payment-label {
+            border-color: #3b82f6;
+            background-color: #f0f7ff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between">
+                <div class="flex space-x-7">
+                    <div>
+                        <!-- Logo -->
+                        <a href="index.html" class="flex items-center py-4 px-2">
+                            <span class="font-semibold text-gray-900 text-2xl">
+                                <i class="fas fa-camera-retro mr-2 text-blue-600"></i>LensLink
+                            </span>
+                        </a>
+                    </div>
+                    <!-- Primary Navbar items -->
+                    <div class="hidden md:flex items-center space-x-1">
+                        <a href="index.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Home</a>
+                        <a href="gallery.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Gallery</a>
+                        <a href="favorites.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Favorites</a>
+                        <a href="payment.html" class="py-4 px-2 text-blue-600 border-b-4 border-blue-600">Cart</a>
+                    </div>
+                </div>
+                <!-- Secondary Navbar items -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <a href="signin.html" class="py-2 px-2 font-medium text-gray-700 hover:text-blue-600 transition duration-300">Sign In</a>
+                    <a href="signup.html" class="py-2 px-2 font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition duration-300">Sign Up</a>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button class="outline-none mobile-menu-button">
+                        <svg class="w-6 h-6 text-gray-700 hover:text-blue-600"
+                            x-show="!showMenu"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div class="hidden mobile-menu">
+            <ul class="">
+                <li><a href="index.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Home</a></li>
+                <li><a href="gallery.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Gallery</a></li>
+                <li><a href="favorites.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Favorites</a></li>
+                <li class="active"><a href="payment.html" class="block text-sm px-2 py-4 text-white bg-blue-600 font-semibold">Payments</a></li>
+                <li><a href="signin.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign In</a></li>
+                <li><a href="signup.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Payment Page Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Payment Form Section -->
+            <div class="md:w-2/3">
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Payment Details</h2>
+                    
+                    <!-- Payment Method Selection -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Payment Method</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Credit Card -->
+                            <div>
+                                <input type="radio" id="credit-card" name="payment-method" value="credit-card" class="hidden payment-method" checked>
+                                <label for="credit-card" class="payment-label block border-2 border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition duration-200">
+                                    <i class="far fa-credit-card text-3xl text-blue-600 mb-2"></i>
+                                    <span class="font-medium">Credit Card</span>
+                                </label>
+                            </div>
+                            <!-- PayPal -->
+                            <div>
+                                <input type="radio" id="paypal" name="payment-method" value="paypal" class="hidden payment-method">
+                                <label for="paypal" class="payment-label block border-2 border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition duration-200">
+                                    <i class="fab fa-paypal text-3xl text-blue-600 mb-2"></i>
+                                    <span class="font-medium">PayPal</span>
+                                </label>
+                            </div>
+                            <!-- Bank Transfer -->
+                            <div>
+                                <input type="radio" id="bank-transfer" name="payment-method" value="bank-transfer" class="hidden payment-method">
+                                <label for="bank-transfer" class="payment-label block border-2 border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition duration-200">
+                                    <i class="fas fa-university text-3xl text-blue-600 mb-2"></i>
+                                    <span class="font-medium">Bank Transfer</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Credit Card Form (shown by default) -->
+                    <div id="credit-card-form">
+                        <div class="mb-6">
+                            <label for="card-number" class="block text-gray-700 font-medium mb-2">Card Number</label>
+                            <div class="relative">
+                                <input type="text" id="card-number" placeholder="1234 5678 9012 3456" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent card-input">
+                                <div class="absolute right-3 top-3 text-gray-400 card-icon">
+                                    <i class="far fa-credit-card"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="card-expiry" class="block text-gray-700 font-medium mb-2">Expiry Date</label>
+                                <input type="text" id="card-expiry" placeholder="MM/YY" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label for="card-cvc" class="block text-gray-700 font-medium mb-2">CVC/CVV</label>
+                                <div class="relative">
+                                    <input type="text" id="card-cvc" placeholder="123" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                                    <div class="absolute right-3 top-3 text-gray-400">
+                                        <i class="fas fa-question-circle" title="3-digit code on back of card"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="card-name" class="block text-gray-700 font-medium mb-2">Name on Card</label>
+                            <input type="text" id="card-name" placeholder="John Smith" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <!-- PayPal Form (hidden by default) -->
+                    <div id="paypal-form" class="hidden">
+                        <div class="bg-gray-100 p-6 rounded-lg text-center">
+                            <p class="text-gray-700 mb-4">You will be redirected to PayPal to complete your payment securely.</p>
+                            <button type="button" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium py-3 px-6 rounded-lg transition duration-200">
+                                <i class="fab fa-paypal mr-2"></i> Proceed to PayPal
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Bank Transfer Form (hidden by default) -->
+                    <div id="bank-transfer-form" class="hidden">
+                        <div class="bg-gray-100 p-6 rounded-lg">
+                            <p class="text-gray-700 mb-4">Please use the following bank details to complete your transfer:</p>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Bank Name:</span>
+                                    <span class="font-medium">PhotoArt Bank</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Account Name:</span>
+                                    <span class="font-medium">PhotoArt Inc.</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Account Number:</span>
+                                    <span class="font-medium">1234567890</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">IBAN:</span>
+                                    <span class="font-medium">US12 3456 7890 1234 5678 90</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">SWIFT/BIC:</span>
+                                    <span class="font-medium">PHARUS33</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mt-4 text-sm">Please include your order number as the payment reference.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Billing Address -->
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Billing Address</h3>
+                        
+                        <div class="mb-4">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600" checked>
+                                <span class="ml-2 text-gray-700">Same as shipping address</span>
+                            </label>
+                        </div>
+                        
+                        <div id="billing-address-fields" class="hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="billing-first-name" class="block text-gray-700 font-medium mb-2">First Name</label>
+                                    <input type="text" id="billing-first-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label for="billing-last-name" class="block text-gray-700 font-medium mb-2">Last Name</label>
+                                    <input type="text" id="billing-last-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label for="billing-address" class="block text-gray-700 font-medium mb-2">Address</label>
+                                <input type="text" id="billing-address" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent mb-2">
+                                <input type="text" id="billing-address2" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <div>
+                                    <label for="billing-city" class="block text-gray-700 font-medium mb-2">City</label>
+                                    <input type="text" id="billing-city" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label for="billing-state" class="block text-gray-700 font-medium mb-2">State/Province</label>
+                                    <input type="text" id="billing-state" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label for="billing-zip" class="block text-gray-700 font-medium mb-2">ZIP/Postal Code</label>
+                                    <input type="text" id="billing-zip" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label for="billing-country" class="block text-gray-700 font-medium mb-2">Country</label>
+                                <select id="billing-country" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                                    <option>United States</option>
+                                    <option>Canada</option>
+                                    <option>United Kingdom</option>
+                                    <option>Australia</option>
+                                    <option>Germany</option>
+                                    <option>France</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Proceed to Payment Button -->
+                    <div class="mt-8">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition duration-200">
+                            Proceed to Payment
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Security Info -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-start">
+                        <div class="text-green-500 mr-4 mt-1">
+                            <i class="fas fa-lock text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Secure Payment</h3>
+                            <p class="text-gray-600">All transactions are secure and encrypted. We do not store your credit card information.</p>
+                            <div class="flex flex-wrap gap-4 mt-4">
+                                <img src="https://via.placeholder.com/50x30?text=Visa" alt="Visa" class="h-8">
+                                <img src="https://via.placeholder.com/50x30?text=MC" alt="Mastercard" class="h-8">
+                                <img src="https://via.placeholder.com/50x30?text=Amex" alt="American Express" class="h-8">
+                                <img src="https://via.placeholder.com/50x30?text=Discover" alt="Discover" class="h-8">
+                                <img src="https://via.placeholder.com/50x30?text=PayPal" alt="PayPal" class="h-8">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Summary Section -->
+            <div class="md:w-1/3">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Order Summary</h2>
+                    
+                    <!-- Items List -->
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between items-start">
+                            <div class="flex">
+                                <div class="w-20 h-20 rounded-lg overflow-hidden mr-4">
+                                    <img src="https://source.unsplash.com/random/200x200/?nature,1" alt="Nature" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Beautiful Sunset</h4>
+                                    <p class="text-gray-600 text-sm">Large (3000x2000)</p>
+                                    <p class="text-gray-600 text-sm">License: Standard</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium text-gray-800">$45.00</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-start">
+                            <div class="flex">
+                                <div class="w-20 h-20 rounded-lg overflow-hidden mr-4">
+                                    <img src="https://source.unsplash.com/random/200x200/?portrait,1" alt="Portrait" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Professional Portrait</h4>
+                                    <p class="text-gray-600 text-sm">Medium (2000x1500)</p>
+                                    <p class="text-gray-600 text-sm">License: Extended</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium text-gray-800">$85.00</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Totals -->
+                    <div class="border-t border-gray-200 pt-4 mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span class="font-medium">$130.00</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Tax</span>
+                            <span class="font-medium">$10.40</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Service Fee</span>
+                            <span class="font-medium">$2.50</span>
+                        </div>
+                        <div class="flex justify-between font-bold text-lg mt-4 pt-2 border-t border-gray-200">
+                            <span>Total</span>
+                            <span>$142.90</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Promo Code -->
+                    <div class="mb-6">
+                        <label for="promo-code" class="block text-gray-700 font-medium mb-2">Promo Code</label>
+                        <div class="flex">
+                            <input type="text" id="promo-code" placeholder="Enter code" class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-r-lg transition duration-200">Apply</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Help Link -->
+                    <div class="text-center">
+                        <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Need help? Contact our support</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4"><i class="fas fa-camera-retro mr-2"></i>PhotoArt</h3>
+                    <p class="text-gray-400">Sell and buy high-quality photos from professional photographers around the world.</p>
+                    <div class="flex mt-4 space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="gallery.html" class="text-gray-400 hover:text-white transition">Gallery</a></li>
+                        <li><a href="favorites.html" class="text-gray-400 hover:text-white transition">Favorites</a></li>
+                        <li><a href="payment.html" class="text-gray-400 hover:text-white transition">Cart</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Categories</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Nature</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Portrait</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Travel</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Architecture</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Wildlife</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
+                    <p class="text-gray-400 mb-4">Subscribe to our newsletter for updates and promotions.</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 w-full rounded-l focus:outline-none text-gray-900">
+                        <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 PhotoArt. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Payment method toggle
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        const creditCardForm = document.getElementById('credit-card-form');
+        const paypalForm = document.getElementById('paypal-form');
+        const bankTransferForm = document.getElementById('bank-transfer-form');
+        
+        paymentMethods.forEach(method => {
+            method.addEventListener('change', function() {
+                // Hide all forms first
+                creditCardForm.classList.add('hidden');
+                paypalForm.classList.add('hidden');
+                bankTransferForm.classList.add('hidden');
+                
+                // Show the selected form
+                if (this.value === 'credit-card') {
+                    creditCardForm.classList.remove('hidden');
+                } else if (this.value === 'paypal') {
+                    paypalForm.classList.remove('hidden');
+                } else if (this.value === 'bank-transfer') {
+                    bankTransferForm.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Billing address toggle
+        const sameAsShippingCheckbox = document.querySelector('input[type="checkbox"]');
+        const billingAddressFields = document.getElementById('billing-address-fields');
+        
+        sameAsShippingCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                billingAddressFields.classList.add('hidden');
+            } else {
+                billingAddressFields.classList.remove('hidden');
+            }
+        });
+
+        // Format card number input
+        const cardNumberInput = document.getElementById('card-number');
+        cardNumberInput.addEventListener('input', function(e) {
+            // Remove all non-digit characters
+            let value = this.value.replace(/\D/g, '');
+            
+            // Add space after every 4 digits
+            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+            
+            // Update the input value
+            this.value = value;
+        });
+
+        // Format expiry date input
+        const expiryInput = document.getElementById('card-expiry');
+        expiryInput.addEventListener('input', function(e) {
+            // Remove all non-digit characters
+            let value = this.value.replace(/\D/g, '');
+            
+            // Add slash after 2 digits (MM/YY format)
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            
+            // Update the input value
+            this.value = value;
+        });
+    </script>
+</body>
+</html>

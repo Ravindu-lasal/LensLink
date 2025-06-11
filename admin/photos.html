@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LensLink Admin - Photos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --dark-color: #2d3436;
+            --light-color: #f5f6fa;
+            --success-color: #00b894;
+            --info-color: #0984e3;
+            --warning-color: #fdcb6e;
+            --danger-color: #d63031;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding-top: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+            border-radius: 5px;
+            padding: 10px 15px;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .photo-thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .photo-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 300px;
+        }
+        
+        .search-box .form-control {
+            padding-left: 40px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #6c757d;
+        }
+        
+        .filter-dropdown .dropdown-menu {
+            padding: 15px;
+            min-width: 250px;
+        }
+        
+        .photo-details-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .photo-preview {
+            flex: 0 0 60%;
+            max-width: 60%;
+            padding-right: 20px;
+        }
+        
+        .photo-info {
+            flex: 0 0 40%;
+            max-width: 40%;
+        }
+        
+        .photo-preview img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tag {
+            display: inline-block;
+            background-color: #e0e0e0;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 992px) {
+            .photo-details-container {
+                flex-direction: column;
+            }
+            
+            .photo-preview,
+            .photo-info {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .photo-preview {
+                padding-right: 0;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar d-flex flex-column flex-shrink-0 p-3" style="width: 250px;">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                <i class="fas fa-camera-retro fa-2x me-2"></i>
+                <span class="fs-4">LensLink Admin</span>
+            </a>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="user.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        Users
+                    </a>
+                </li>
+                <li>
+                    <a href="photos.html" class="nav-link active">
+                        <i class="fas fa-images"></i>
+                        Photos
+                    </a>
+                </li>
+                <li>
+                    <a href="feedback.html" class="nav-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        Feedbacks
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Admin" class="rounded-circle me-2" width="32" height="32">
+                    <strong>Admin</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Photos Management</h2>
+                <div class="d-flex">
+                    <div class="search-box me-3">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="Search photos...">
+                    </div>
+                    <div class="filter-dropdown me-3">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-filter me-2"></i>Filters
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="filterDropdown">
+                            <h6 class="dropdown-header">Photo Status</h6>
+                            <div class="form-check ms-3 mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="filterApproved" checked>
+                                <label class="form-check-label" for="filterApproved">
+                                    Approved
+                                </label>
+                            </div>
+                            <div class="form-check ms-3 mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="filterPending">
+                                <label class="form-check-label" for="filterPending">
+                                    Pending Review
+                                </label>
+                            </div>
+                            <div class="form-check ms-3">
+                                <input class="form-check-input" type="checkbox" value="" id="filterRejected">
+                                <label class="form-check-label" for="filterRejected">
+                                    Rejected
+                                </label>
+                            </div>
+                            <hr>
+                            <h6 class="dropdown-header">Categories</h6>
+                            <div class="form-check ms-3 mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="filterLandscape" checked>
+                                <label class="form-check-label" for="filterLandscape">
+                                    Landscape
+                                </label>
+                            </div>
+                            <div class="form-check ms-3 mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="filterPortrait" checked>
+                                <label class="form-check-label" for="filterPortrait">
+                                    Portrait
+                                </label>
+                            </div>
+                            <div class="form-check ms-3 mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="filterWildlife">
+                                <label class="form-check-label" for="filterWildlife">
+                                    Wildlife
+                                </label>
+                            </div>
+                            <div class="form-check ms-3 mb-2">
+                                <input class="form-check-input" type="checkbox" value="" id="filterStreet">
+                                <label class="form-check-label" for="filterStreet">
+                                    Street
+                                </label>
+                            </div>
+                            <div class="form-check ms-3">
+                                <input class="form-check-input" type="checkbox" value="" id="filterArchitecture">
+                                <label class="form-check-label" for="filterArchitecture">
+                                    Architecture
+                                </label>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-sm btn-outline-danger">Reset</button>
+                                <button class="btn btn-sm btn-primary">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadPhotoModal">
+                        <i class="fas fa-upload me-2"></i>Upload Photo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Photo Details Card (Visible when a photo is selected) -->
+            <div class="card mb-4 d-none" id="photoDetailsCard">
+                <div class="card-body">
+                    <button class="btn btn-sm btn-outline-secondary mb-3" id="backToPhotos">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Photos
+                    </button>
+                    
+                    <div class="photo-details-container">
+                        <div class="photo-preview">
+                            <img src="https://source.unsplash.com/random/800x600/?landscape" alt="Selected Photo" id="selectedPhoto" class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-outline-primary">
+                                    <i class="fas fa-thumbs-up me-2"></i>Approve
+                                </button>
+                                <button class="btn btn-outline-danger">
+                                    <i class="fas fa-thumbs-down me-2"></i>Reject
+                                </button>
+                                <button class="btn btn-outline-secondary">
+                                    <i class="fas fa-edit me-2"></i>Edit
+                                </button>
+                                <button class="btn btn-outline-dark">
+                                    <i class="fas fa-download me-2"></i>Download
+                                </button>
+                            </div>
+                        </div>
+                        <div class="photo-info">
+                            <h4 id="photoTitle">Mountain Sunset</h4>
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="user-profile me-2">
+                                <div>
+                                    <h6 class="mb-0">Sarah Johnson</h6>
+                                    <small class="text-muted">Photographer</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6>Description</h6>
+                                <p id="photoDescription">This breathtaking sunset was captured during my hiking trip in the Rocky Mountains. The golden hour light created amazing contrast with the mountain peaks. Taken with Canon EOS R5, 24-70mm f/2.8 lens at 35mm, f/8, 1/125s, ISO 100.</p>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <h6>Uploaded</h6>
+                                    <p>May 15, 2023</p>
+                                </div>
+                                <div class="col-6">
+                                    <h6>Status</h6>
+                                    <span class="badge bg-success">Approved</span>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <h6>Price</h6>
+                                    <p>$120</p>
+                                </div>
+                                <div class="col-6">
+                                    <h6>Downloads</h6>
+                                    <p>24</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6>Tags</h6>
+                                <div>
+                                    <span class="tag">landscape</span>
+                                    <span class="tag">sunset</span>
+                                    <span class="tag">mountains</span>
+                                    <span class="tag">nature</span>
+                                    <span class="tag">golden hour</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6>EXIF Data</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted">Camera</small>
+                                        <p>Canon EOS R5</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Lens</small>
+                                        <p>24-70mm f/2.8</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Focal Length</small>
+                                        <p>35mm</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Aperture</small>
+                                        <p>f/8</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Shutter Speed</small>
+                                        <p>1/125s</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">ISO</small>
+                                        <p>100</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photos Grid -->
+            <div class="row" id="photosGrid">
+                <!-- Photo Card 1 -->
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 photo-card" data-photo-id="1">
+                    <div class="card h-100">
+                        <img src="https://source.unsplash.com/random/600x400/?landscape" class="photo-thumbnail card-img-top" alt="Landscape Photo">
+                        <div class="card-body">
+                            <h5 class="card-title">Mountain Sunset</h5>
+                            <p class="card-text photo-description">Breathtaking sunset captured in the Rocky Mountains during golden hour with amazing light contrast.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="user-profile me-2">
+                                    <small>Sarah Johnson</small>
+                                </div>
+                                <span class="badge bg-success">Approved</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">$120</small>
+                                <small class="text-muted">15 downloads</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photo Card 2 -->
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 photo-card" data-photo-id="2">
+                    <div class="card h-100">
+                        <img src="https://source.unsplash.com/random/600x400/?portrait" class="photo-thumbnail card-img-top" alt="Portrait Photo">
+                        <div class="card-body">
+                            <h5 class="card-title">Urban Portrait</h5>
+                            <p class="card-text photo-description">Professional portrait session in downtown with natural light and urban background.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="user-profile me-2">
+                                    <small>Michael Chen</small>
+                                </div>
+                                <span class="badge bg-success">Approved</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">$85</small>
+                                <small class="text-muted">8 downloads</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photo Card 3 -->
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 photo-card" data-photo-id="3">
+                    <div class="card h-100">
+                        <img src="https://source.unsplash.com/random/600x400/?wildlife" class="photo-thumbnail card-img-top" alt="Wildlife Photo">
+                        <div class="card-body">
+                            <h5 class="card-title">African Elephant</h5>
+                            <p class="card-text photo-description">Majestic elephant in the Serengeti during migration season. Shot with telephoto lens from a safe distance.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://randomuser.me/api/portraits/men/65.jpg" class="user-profile me-2">
+                                    <small>David Wilson</small>
+                                </div>
+                                <span class="badge bg-warning">Pending</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">$150</small>
+                                <small class="text-muted">0 downloads</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photo Card 4 -->
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 photo-card" data-photo-id="4">
+                    <div class="card h-100">
+                        <img src="https://source.unsplash.com/random/600x400/?architecture" class="photo-thumbnail card-img-top" alt="Architecture Photo">
+                        <div class="card-body">
+                            <h5 class="card-title">Modern Skyscraper</h5>
+                            <p class="card-text photo-description">Abstract architectural photography of a downtown skyscraper with geometric patterns and reflections.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://randomuser.me/api/portraits/women/33.jpg" class="user-profile me-2">
+                                    <small>Emily Rodriguez</small>
+                                </div>
+                                <span class="badge bg-danger">Rejected</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">$95</small>
+                                <small class="text-muted">3 downloads</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photo Card 5 -->
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 photo-card" data-photo-id="5">
+                    <div class="card h-100">
+                        <img src="https://source.unsplash.com/random/600x400/?street" class="photo-thumbnail card-img-top" alt="Street Photo">
+                        <div class="card-body">
+                            <h5 class="card-title">City Life</h5>
+                            <p class="card-text photo-description">Candid street photography capturing the essence of urban life and human interactions.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://randomuser.me/api/portraits/women/68.jpg" class="user-profile me-2">
+                                    <small>Jessica Lee</small>
+                                </div>
+                                <span class="badge bg-success">Approved</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">$65</small>
+                                <small class="text-muted">12 downloads</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photo Card 6 -->
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 photo-card" data-photo-id="6">
+                    <div class="card h-100">
+                        <img src="https://source.unsplash.com/random/600x400/?food" class="photo-thumbnail card-img-top" alt="Food Photo">
+                        <div class="card-body">
+                            <h5 class="card-title">Gourmet Dish</h5>
+                            <p class="card-text photo-description">Professional food photography for a restaurant menu. Carefully styled with natural lighting.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://randomuser.me/api/portraits/men/75.jpg" class="user-profile me-2">
+                                    <small>James Brown</small>
+                                </div>
+                                <span class="badge bg-success">Approved</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">$75</small>
+                                <small class="text-muted">6 downloads</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photo Card 7 -->
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 photo-card" data-photo-id="7">
+                    <div class="card h-100">
+                        <img src="https://source.unsplash.com/random/600x400/?beach" class="photo-thumbnail card-img-top" alt="Beach Photo">
+                        <div class="card-body">
+                            <h5 class="card-title">Tropical Paradise</h5>
+                            <p class="card-text photo-description">Aerial drone shot of a secluded tropical beach with crystal clear water and white sand.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://randomuser.me/api/portraits/women/52.jpg" class="user-profile me-2">
+                                    <small>Sophia Garcia</small>
+                                </div>
+                                <span class="badge bg-warning">Pending</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">$110</small>
+                                <small class="text-muted">1 download</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photo Card 8 -->
+                <div class="col-md-6 col-lg-4 col-xl-3 mb-4 photo-card" data-photo-id="8">
+                    <div class="card h-100">
+                        <img src="https://source.unsplash.com/random/600x400/?night" class="photo-thumbnail card-img-top" alt="Night Photo">
+                        <div class="card-body">
+                            <h5 class="card-title">City Lights</h5>
+                            <p class="card-text photo-description">Long exposure night photography of city traffic and neon lights creating light trails.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://randomuser.me/api/portraits/men/38.jpg" class="user-profile me-2">
+                                    <small>Daniel Kim</small>
+                                </div>
+                                <span class="badge bg-success">Approved</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">$90</small>
+                                <small class="text-muted">9 downloads</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            <nav aria-label="Photo pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Upload Photo Modal -->
+    <div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadPhotoModalLabel">Upload New Photo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="photoFile" class="form-label">Photo File</label>
+                            <input class="form-control" type="file" id="photoFile" accept="image/*" required>
+                            <div class="form-text">Maximum file size: 20MB. Supported formats: JPG, PNG, HEIC</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="photoTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="photoTitle" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="photoDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="photoDescription" rows="3" required></textarea>
+                            <div class="form-text">Tell the story behind this photo, equipment used, and any special techniques.</div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="photoCategory" class="form-label">Category</label>
+                                <select class="form-select" id="photoCategory" required>
+                                    <option value="">Select category</option>
+                                    <option value="landscape">Landscape</option>
+                                    <option value="portrait">Portrait</option>
+                                    <option value="wildlife">Wildlife</option>
+                                    <option value="street">Street</option>
+                                    <option value="architecture">Architecture</option>
+                                    <option value="food">Food</option>
+                                    <option value="travel">Travel</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="photoPrice" class="form-label">Price ($)</label>
+                                <input type="number" class="form-control" id="photoPrice" min="5" max="500" value="50" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="photoTags" class="form-label">Tags</label>
+                            <input type="text" class="form-control" id="photoTags" placeholder="landscape, sunset, nature">
+                            <div class="form-text">Separate tags with commas (up to 10 tags)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">EXIF Data</label>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" placeholder="Camera Model">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" placeholder="Lens">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" placeholder="Focal Length">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" placeholder="Aperture">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" placeholder="Shutter Speed">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" placeholder="ISO">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Upload Photo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show photo details when a photo card is clicked
+            document.querySelectorAll('.photo-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const photoId = this.getAttribute('data-photo-id');
+                    
+                    // Hide the grid and show the details card
+                    document.getElementById('photosGrid').classList.add('d-none');
+                    document.getElementById('photoDetailsCard').classList.remove('d-none');
+                    
+                    // In a real application, you would fetch photo details from an API
+                    // Here we're just showing the card with the existing data
+                    
+                    // Scroll to the top of the details card
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+            
+            // Back to photos button
+            document.getElementById('backToPhotos').addEventListener('click', function() {
+                document.getElementById('photosGrid').classList.remove('d-none');
+                document.getElementById('photoDetailsCard').classList.add('d-none');
+            });
+        });
+    </script>
+</body>
+</html>
