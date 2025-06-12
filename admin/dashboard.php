@@ -92,6 +92,7 @@ $recent_photos = $conn->query($recent_photos_sql);
         .main-content {
             margin-left: 250px;
             padding: 20px;
+            width: 100%;
         }
 
         .card {
@@ -114,31 +115,43 @@ $recent_photos = $conn->query($recent_photos_sql);
         .stat-card .card-body {
             display: flex;
             align-items: center;
+            padding: 1.5rem;
         }
 
         .stat-card .icon-container {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
+            margin-right: 1rem;
+        }
+
+        .stat-card .card-title {
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .stat-card .card-subtitle {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
         }
 
         .users-icon {
-            background-color: rgba(106, 176, 76, 0.2);
-            color: #6ab04c;
+            background-color: #e3f2fd;
+            color: #1976d2;
         }
 
         .photos-icon {
-            background-color: rgba(253, 121, 168, 0.2);
-            color: #fd79a8;
+            background-color: #fce4ec;
+            color: #c2185b;
         }
 
         .sales-icon {
-            background-color: rgba(253, 203, 110, 0.2);
-            color: #fdcb6e;
+            background-color: #f3e5f5;
+            color: #7b1fa2;
         }
 
         .revenue-icon {
@@ -151,22 +164,43 @@ $recent_photos = $conn->query($recent_photos_sql);
             overflow: hidden;
         }
 
+        .table {
+            margin-bottom: 0;
+        }
+
         .table thead {
-            background-color: var(--primary-color);
-            color: white;
+            background-color: #f8f9fa;
         }
 
-        .badge-success {
-            background-color: var(--success-color);
+        .table thead th {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-top: none;
         }
 
-        .badge-warning {
-            background-color: var(--warning-color);
-            color: var(--dark-color);
+        .table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
         }
 
-        .badge-danger {
-            background-color: var(--danger-color);
+        .badge {
+            padding: 0.5em 1em;
+            font-weight: 500;
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, .075);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .card-title {
+            margin-bottom: 0;
+            color: #344767;
+            font-size: 1.125rem;
         }
 
         .chart-container {
@@ -198,7 +232,7 @@ $recent_photos = $conn->query($recent_photos_sql);
         <!-- Main Content -->
         <div class="main-content">
             <div class="mb-4">
-                <h2>Dashboard Overview</h2>
+                <h2 class="h4 text-gray-900">Dashboard Overview</h2>
             </div><!-- Stats Cards -->
             <div class="row">
                 <div class="col-md-6 col-lg-4">
