@@ -8,8 +8,8 @@
                       <?php echo $imageTitle; ?>
                   </h3>
                   <p class="text-white mb-4">$45.00</p>
-                  <button onclick="openImageModal('./images/Home/robert-lukeman-PH0HYjsf2n8-unsplash.jpg')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                      View Details
+                  <button>
+                      <a href="">view Details</a>
                   </button>
               </div>
           </div>
