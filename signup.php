@@ -39,6 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,10 +47,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="bg-gray-50">
     <!-- Navigation -->
     <?php
-     include 'includes/navigation.php';
+    include 'includes/navigation.php';
     ?>
 
     <!-- Sign Up Form -->
@@ -61,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </h2>
                 <p class="mt-2 text-center text-sm text-gray-600">
                     Already have an account?
-                    <a href="signin.html" class="font-medium text-blue-600 hover:text-blue-500">
+                    <a href="signin.php" class="font-medium text-blue-600 hover:text-blue-500">
                         Sign in here
                     </a>
                 </p>
@@ -126,52 +128,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         Sign up
                     </button>
                 </div>
-                
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">
-                            Or sign up with
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-3 gap-3">
-                    <div>
-                        <button type="button"
-                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <i class="fab fa-google text-red-500"></i>
-                        </button>
-                    </div>
-                    <div>
-                        <button type="button"
-                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <i class="fab fa-facebook-f text-blue-600"></i>
-                        </button>
-                    </div>
-                    <div>
-                        <button type="button"
-                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <i class="fab fa-twitter text-blue-400"></i>
-                        </button>
-                    </div>
-                </div>
             </form>
         </div>
     </div>
 
     <!-- Footer -->
     <?php
-     include 'includes/footer.php';
+    include 'includes/footer.php';
     ?>
 
-      <script>
+    <script>
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
-        
+
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
@@ -185,27 +155,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             const terms = document.getElementById('terms').checked;
-            
+
             // Simple validation
             if (!firstName || !lastName || !email || !password || !confirmPassword) {
                 e.preventDefault();
                 alert('Please fill in all fields');
                 return;
             }
-            
+
             if (password !== confirmPassword) {
                 e.preventDefault();
                 alert('Passwords do not match');
                 return;
             }
-            
+
             if (!terms) {
                 e.preventDefault();
                 alert('You must agree to the terms and conditions');
                 return;
             }
-            
+
         });
     </script>
 </body>
+
 </html>
