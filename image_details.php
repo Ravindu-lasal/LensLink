@@ -29,6 +29,29 @@ if ($result->num_rows === 0) {
 
 $image = $result->fetch_assoc();
 
+// Check if the current user has purchased this image
+$has_purchased = false;
+$is_favorited = false;
+if (isset($_SESSION['user_id'])) {
+    $purchase_check_sql = "SELECT 1 FROM images i 
+                          INNER JOIN order_items oi ON i.id = oi.image_id
+                          INNER JOIN orders o ON oi.order_id = o.id
+                          INNER JOIN payments p ON o.id = p.order_id
+                          WHERE o.user_id = ? AND i.id = ? AND p.payment_status = 'completed'
+                          LIMIT 1";
+    $check_stmt = $conn->prepare($purchase_check_sql);
+    $check_stmt->bind_param("ii", $_SESSION['user_id'], $image_id);
+    $check_stmt->execute();
+    $has_purchased = $check_stmt->get_result()->num_rows > 0;
+
+    // Check if image is favorited
+    $fav_check_sql = "SELECT 1 FROM favorites WHERE user_id = ? AND image_id = ?";
+    $fav_stmt = $conn->prepare($fav_check_sql);
+    $fav_stmt->bind_param("ii", $_SESSION['user_id'], $image_id);
+    $fav_stmt->execute();
+    $is_favorited = $fav_stmt->get_result()->num_rows > 0;
+}
+
 // Fetch related images from the same category
 $related_sql = "SELECT * FROM images WHERE category_id = ? AND id != ? LIMIT 4";
 $stmt = $conn->prepare($related_sql);
@@ -82,16 +105,29 @@ $related_images = $stmt->get_result();
                     <div class="mb-6">
                         <p class="text-3xl font-bold text-blue-600">Lkr <?= number_format($image['price'], 2) ?></p>
                         <p class="text-sm text-gray-500">Includes commercial license</p>
-                    </div>
+                    </div> <?php if (isset($_SESSION['user_id'])): ?>
+                        <form method="POST" action="toggle_favorite.php">
+                            <input type="hidden" name="image_id" value="<?= $image_id ?>">
+                            <button type="submit"
+                                class="mb-4 flex items-center justify-center w-full px-4 py-2 text-sm font-medium rounded-md <?= $is_favorited ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700' ?> hover:bg-opacity-90 transition-colors">
+                                <i class="fas fa-heart mr-2"></i>
+                                <span><?= $is_favorited ? 'Remove from Favorites' : 'Add to Favorites' ?></span>
+                            </button>
+                        </form>
+                    <?php endif; ?>
+
                     <div class="space-y-4">
                         <?php if (isset($_SESSION['user_id'])): ?>
-                            <button onclick="addToCart(<?= $image['id'] ?>)"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                            </button>
-                            <button class="w-full bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-heart mr-2"></i> Add to Favorites
-                            </button>
+                            <?php if ($has_purchased): ?>
+                                <a href="download_image.php?id=<?= $image['id'] ?>"
+                                    class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-download mr-2"></i> Download Image
+                                </a> <?php else: ?>
+                                <button onclick="addToCart(<?= $image['id'] ?>)"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
+                                </button>
+                            <?php endif; ?>
                             <div id="addToCartMessage" class="hidden text-center p-2 rounded-lg"></div>
                         <?php else: ?>
                             <a href="signin.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>"

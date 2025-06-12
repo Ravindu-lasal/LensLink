@@ -1,25 +1,51 @@
 <?php
+require_once 'config/db_conn.php';
 session_start();
 
-include_once 'config/db_conn.php';
+// Fetch categories
+$categories = [];
+$sql = "SELECT id, name FROM categories ORDER BY name ASC";
+$result = $conn->query($sql);
 
-$allImages = [];
-
-$imageSql = "SELECT i.*, u.name as photographer FROM images i 
-            LEFT JOIN users u ON i.user_id = u.id 
-            WHERE i.is_public = 1 
-            ORDER BY i.created_at DESC 
-            LIMIT 3";
-$imageResult = $conn->query($imageSql);
-if ($imageResult && $imageResult->num_rows > 0) {
-    while ($row = $imageResult->fetch_assoc()) {
-        $allImages[] = $row;
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $categories[] = $row;
     }
-} else {
-    // Handle case where no images are found
-    $allImages = [];
 }
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: signin.php');
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+$imgsql = "SELECT images.*, categories.name AS category_name FROM images 
+        LEFT JOIN categories ON images.category_id = categories.id 
+        WHERE images.user_id = ? ORDER BY created_at DESC";
+
+$stmt = $conn->prepare($imgsql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Debug information
+echo "<!-- Debug: Number of images found: " . $result->num_rows . " -->";
+
+// Store all results in an array for debugging
+$all_images = [];
+while ($row = $result->fetch_assoc()) {
+    $all_images[] = $row;
+}
+echo "<!-- Debug: Image IDs found: " . implode(', ', array_column($all_images, 'id')) . " -->";
+
+// Reset the result pointer to the beginning
+mysqli_data_seek($result, 0);
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -38,140 +64,148 @@ if ($imageResult && $imageResult->num_rows > 0) {
         .modal {
             transition: opacity 0.3s ease-in-out;
         }
-
-        /* Slider styles */
-        .slider-container {
-            position: relative;
-        }
-
-        .slider-track {
-            display: flex;
-            width: 300%;
-            animation: slide 15s infinite linear;
-        }
-
-        @keyframes slide {
-            0% {
-                transform: translateX(0);
-            }
-
-            33% {
-                transform: translateX(-33.33%);
-            }
-
-            66% {
-                transform: translateX(-66.66%);
-            }
-
-            100% {
-                transform: translateX(0);
-            }
-        }
-
-        .slider-slide {
-            flex-shrink: 0;
-        }
     </style>
+    <script>
+        function showMessage(message, isSuccess) {
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.textContent = message;
+            messageContainer.className = `mb-4 p-4 rounded-lg ${isSuccess ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            messageContainer.classList.remove('hidden');
+            setTimeout(() => {
+                messageContainer.classList.add('hidden');
+            }, 3000);
+        }
+
+        function deleteImage(imageId) {
+            if (confirm('Are you sure you want to delete this image?')) {
+                fetch('delete_image.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            image_id: imageId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the image card from the UI
+                            const imageCard = document.querySelector(`[data-image-id="${imageId}"]`);
+                            if (imageCard) {
+                                imageCard.remove();
+                                showMessage('Image deleted successfully', true);
+                            }
+                        } else {
+                            showMessage('Error deleting image: ' + data.message, false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showMessage('Error deleting image', false);
+                    });
+            }
+        }
+    </script>
 </head>
 
 <body class="bg-gray-50">
     <!-- Navigation -->
     <?php
     include('includes/navigation.php');
-    ?>
+    ?> <!-- Gallery Page Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Success/Error Message Container -->
+        <div id="messageContainer" class="hidden mb-4 p-4 rounded-lg"></div>
 
-
-    <!-- Homepage Hero Slider -->
-    <div class="relative">
-        <div class="slider-container overflow-hidden h-96">
-            <div class="slider-track flex transition-transform duration-1000 ease-in-out">
-                <div class="slider-slide min-w-full">
-                    <img src="Images/cover (1).jpg" alt="Nature" class="w-full h-96 object-cover">
-                </div>
-                <div class="slider-slide min-w-full">
-                    <img src="Images/cover (2).jpg" alt="Portrait" class="w-full h-96 object-cover">
-                </div>
-                <div class="slider-slide min-w-full">
-                    <img src="Images/cover (4).jpg" alt="Travel" class="w-full h-96 object-cover">
-                </div>
-            </div>
-        </div>
-        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
-            <div class="text-center text-white max-w-2xl px-4">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome to PhotoArt</h1>
-                <p class="text-xl mb-6">Discover and share beautiful photography from around the world</p>
-                <a href="gallery.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-medium inline-block">Browse Gallery</a>
-            </div>
-        </div>
-        <div class="absolute bottom-0 w-full flex justify-center mb-4">
-            <button class="slider-prev mx-2 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10"><i class="fas fa-chevron-left"></i></button>
-            <button class="slider-next mx-2 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10"><i class="fas fa-chevron-right"></i></button>
-        </div>
-    </div>
-
-    <!-- Featured Photos -->
-    <div class="container mx-auto px-4 py-12">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Featured Photos</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto">Explore some of our most popular images from talented photographers worldwide</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">My Photo Gallery</h1>
             <?php
-            foreach ($allImages as $image) {
-                // Include the image card component
-                $imageTitle = htmlspecialchars($image['title']);
-                $imageDescription = htmlspecialchars($image['description']);
-                $imageSrc = htmlspecialchars($image['image_url']);
-                $imageId = $image['id'];
-
-                include 'includes/imageCard.php';
+            if (isset($_SESSION['user_id'])) {
+                echo '<button onclick="openUploadModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">';
+                echo '<i class="fas fa-plus mr-2"></i> Upload New Image';
+                echo '</button>';
             }
             ?>
         </div>
-    </div>
 
-    <!-- About Us Section -->
-    <div class="bg-gray-100 py-16">
-        <div class="container mx-auto px-4">
-            <div class="md:flex md:items-center md:space-x-12">
-                <div class="md:w-1/2 mb-8 md:mb-0">
-                    <img src="./Images/capture.jpg" alt="About PhotoArt" class="rounded-lg shadow-lg w-full">
-                </div>
-                <div class="md:w-1/2">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-6">About PhotoArt</h2>
-                    <p class="text-gray-600 mb-4">Welcome to PhotoArt, the premier destination for buying and selling high-quality photography. Our platform connects talented photographers with individuals and businesses looking for stunning visuals.</p>
-                    <p class="text-gray-600 mb-6">Whether you need images for commercial projects, personal use, or simply want to appreciate beautiful photography, we have something for everyone. Join our growing community of creatives today!</p>
-                    <div class="space-y-4">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 text-blue-600 mt-1 mr-3">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <p class="text-gray-700">High-quality images from professional photographers</p>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 text-blue-600 mt-1 mr-3">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <p class="text-gray-700">Secure payment system and licensed downloads</p>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 text-blue-600 mt-1 mr-3">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <p class="text-gray-700">Global community of photography enthusiasts</p>
+        <!-- Search and Filter -->
+        <div class="flex flex-col md:flex-row justify-between mb-8">
+            <div class="relative mb-4 md:mb-0">
+                <input type="text" placeholder="Search images..." class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+            </div>
+            <div class="flex space-x-2">
+                <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <option>All Categories</option>
+                    <option>Nature</option>
+                    <option>Portrait</option>
+                    <option>Travel</option>
+                    <option>Architecture</option>
+                </select>
+                <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <option>Sort By</option>
+                    <option>Newest</option>
+                    <option>Oldest</option>
+                    <option>Most Popular</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                </select>
+            </div>
+        </div> <!-- Image Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Image Card 1 -->
+            <?php
+            $count = 0;
+            while ($row = $result->fetch_assoc()):
+                $count++;
+                echo "<!-- Debug: Processing image #{$count}, ID: {$row['id']} -->";
+            ?><div class="relative overflow-hidden rounded-lg shadow-lg group image-card" data-image-id="<?= $row['id'] ?>">
+                    <a href="image_details.php?id=<?= $row['id'] ?>">
+                        <img src="<?= htmlspecialchars($row['image_url']) ?>"
+                            alt="<?= htmlspecialchars($row['title']) ?>"
+                            class="w-full h-64 object-cover">
+                    </a>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button onclick="deleteImage(<?= $row['id'] ?>)" class="text-white hover:text-red-400 p-4">
+                            <i class="fas fa-trash text-3xl mb-2"></i>
+                            <br>Remove Image
+                        </button>
+                        <div class="text-center p-4">
+                            <h3 class="text-white font-bold text-xl mb-2"><?= htmlspecialchars($row['title']) ?></h3>
+                            <p class="text-white text-sm mb-2"><?= htmlspecialchars($row['category_name']) ?></p>
+                            <p class="text-white">Lkr <?= number_format($row['price'], 2) ?></p>
                         </div>
                     </div>
                 </div>
-            </div>
+            <?php endwhile; ?>
+
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-center mt-10">
+            <nav class="inline-flex rounded-md shadow">
+                <a href="#" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50">
+                    Previous
+                </a>
+                <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-700 hover:bg-gray-50">
+                    1
+                </a>
+                <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-700 hover:bg-gray-50">
+                    2
+                </a>
+                <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-700 hover:bg-gray-50">
+                    3
+                </a>
+                <a href="#" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50">
+                    Next
+                </a>
+            </nav>
         </div>
     </div>
 
-
-    </div>
-
-    <!-- Footer -->
     <?php
-    include 'includes/footer.php';
+    include 'includes/footer.php'
     ?>
 
     <!-- Image Preview Modal -->
@@ -226,47 +260,41 @@ if ($imageResult && $imageResult->num_rows > 0) {
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Upload Image Modal -->
-    <div id="uploadModal" class="fixed inset-0 z-50 hidden modal">
+    </div> <!-- Upload Image Modal -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden modal overflow-y-auto">
         <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeUploadModal()"></div>
         <div class="relative max-w-2xl mx-auto my-8 p-4">
-            <div class="bg-white rounded-lg p-6">
+            <div class="bg-white rounded-lg p-6 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Upload New Image</h2>
                     <button onclick="closeUploadModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <form>
+                <form action="add_images.php" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="user_id" value="<?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : ''; ?>">
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2" for="imageTitle">Image Title</label>
-                        <input type="text" id="imageTitle" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <input type="text" id="imageTitle" name="imageTitle" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2" for="imageDescription">Description</label>
-                        <textarea id="imageDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+                        <textarea id="imageDescription" name="imageDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2" for="imageCategory">Category</label>
-                        <select id="imageCategory" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
-                            <option>Nature</option>
-                            <option>Portrait</option>
-                            <option>Travel</option>
-                            <option>Architecture</option>
-                            <option>Food</option>
-                            <option>Fashion</option>
-                            <option>Abstract</option>
+                        <select id="imageCategory" name="imageCategory" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
+                            <option value="">-- Select Category --</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= htmlspecialchars($category['id']) ?>">
+                                    <?= htmlspecialchars($category['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-gray-700 mb-2" for="imageTags">Tags (comma separated)</label>
-                        <input type="text" id="imageTags" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="sunset, beach, ocean">
-                    </div>
-                    <div class="mb-4">
                         <label class="block text-gray-700 mb-2" for="imagePrice">Price ($)</label>
-                        <input type="number" id="imagePrice" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="50.00">
+                        <input type="number" id="imagePrice" name="imagePrice" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="50.00">
                     </div>
                     <div class="mb-6">
                         <label class="block text-gray-700 mb-2">Upload Image</label>
@@ -277,7 +305,7 @@ if ($imageResult && $imageResult->num_rows > 0) {
                             <div id="uploadPrompt" class="flex flex-col items-center">
                                 <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
                                 <p class="text-gray-600 mb-2">Drag & drop your image here or click to browse</p>
-                                <input type="file" id="imageUpload" class="hidden" accept="image/*">
+                                <input type="file" id="imageUpload" name="imageUpload" class="hidden" accept="image/*">
                                 <label for="imageUpload" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded cursor-pointer">
                                     Select Image
                                 </label>
@@ -334,44 +362,6 @@ if ($imageResult && $imageResult->num_rows > 0) {
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
         }
-
-        // Slider functionality
-        const sliderTrack = document.querySelector('.slider-track');
-        const slides = document.querySelectorAll('.slider-slide');
-        const prevBtn = document.querySelector('.slider-prev');
-        const nextBtn = document.querySelector('.slider-next');
-        let currentIndex = 0;
-
-        function goToSlide(index) {
-            sliderTrack.style.transform = `translateX(-${index * 100}%)`;
-            currentIndex = index;
-        }
-
-        function nextSlide() {
-            currentIndex = (currentIndex + 1) % slides.length;
-            goToSlide(currentIndex);
-        }
-
-        function prevSlide() {
-            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-            goToSlide(currentIndex);
-        }
-
-        nextBtn.addEventListener('click', nextSlide);
-        prevBtn.addEventListener('click', prevSlide);
-
-        // Auto-play slider
-        let sliderInterval = setInterval(nextSlide, 5000);
-
-        // Pause on hover
-        const sliderContainer = document.querySelector('.slider-container');
-        sliderContainer.addEventListener('mouseenter', () => {
-            clearInterval(sliderInterval);
-        });
-
-        sliderContainer.addEventListener('mouseleave', () => {
-            sliderInterval = setInterval(nextSlide, 5000);
-        });
 
         // Image upload preview
         const imageUpload = document.getElementById('imageUpload');

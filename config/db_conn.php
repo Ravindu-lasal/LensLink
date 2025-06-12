@@ -4,7 +4,7 @@ $host = 'localhost';
 $db   = 'image_store';
 $user = 'root';
 $pass = '';
-// $pass = '1234';
+$pass = '1234';
 
 $conn = new mysqli($host, $user, $pass, $db);
 

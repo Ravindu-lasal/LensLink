@@ -1,5 +1,45 @@
+<?php
+require_once '../config/db_conn.php';
+session_start();
+
+// Fetch total users count
+$users_sql = "SELECT COUNT(*) as total FROM users";
+$users_result = $conn->query($users_sql);
+$total_users = $users_result->fetch_assoc()['total'];
+
+// Fetch total images count
+$images_sql = "SELECT COUNT(*) as total FROM images";
+$images_result = $conn->query($images_sql);
+$total_images = $images_result->fetch_assoc()['total'];
+
+// Fetch total sales (completed payments)
+$sales_sql = "SELECT COUNT(*) as total_sales, SUM(amount) as total_revenue 
+              FROM payments 
+              WHERE payment_status = 'completed'";
+$sales_result = $conn->query($sales_sql);
+$sales_data = $sales_result->fetch_assoc();
+$total_sales = $sales_data['total_sales'];
+$total_revenue = $sales_data['total_revenue'] ?? 0;
+
+// Fetch recent orders
+$recent_orders_sql = "SELECT o.id, o.total_amount, u.name as user_name, o.created_at, o.status
+                      FROM orders o
+                      JOIN users u ON o.user_id = u.id
+                      ORDER BY o.created_at DESC
+                      LIMIT 5";
+$recent_orders = $conn->query($recent_orders_sql);
+
+// Fetch recent photos
+$recent_photos_sql = "SELECT i.*, u.name as photographer_name 
+                      FROM images i
+                      JOIN users u ON i.user_id = u.id
+                      ORDER BY i.created_at DESC
+                      LIMIT 5";
+$recent_photos = $conn->query($recent_photos_sql);
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,12 +57,12 @@
             --warning-color: #fdcb6e;
             --danger-color: #d63031;
         }
-        
+
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .sidebar {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -31,28 +71,30 @@
             padding-top: 20px;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .sidebar .nav-link {
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 5px;
             border-radius: 5px;
             padding: 10px 15px;
         }
-        
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
             background-color: rgba(255, 255, 255, 0.2);
             color: white;
         }
-        
+
         .sidebar .nav-link i {
             margin-right: 10px;
         }
-        
+
         .main-content {
             margin-left: 250px;
             padding: 20px;
+            width: 100%;
         }
-        
+
         .card {
             border: none;
             border-radius: 10px;
@@ -60,84 +102,117 @@
             transition: transform 0.3s;
             margin-bottom: 20px;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
         }
-        
+
         .card-icon {
             font-size: 2rem;
             opacity: 0.7;
         }
-        
+
         .stat-card .card-body {
             display: flex;
             align-items: center;
+            padding: 1.5rem;
         }
-        
+
         .stat-card .icon-container {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
+            margin-right: 1rem;
         }
-        
+
+        .stat-card .card-title {
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .stat-card .card-subtitle {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
         .users-icon {
-            background-color: rgba(106, 176, 76, 0.2);
-            color: #6ab04c;
+            background-color: #e3f2fd;
+            color: #1976d2;
         }
-        
+
         .photos-icon {
-            background-color: rgba(253, 121, 168, 0.2);
-            color: #fd79a8;
+            background-color: #fce4ec;
+            color: #c2185b;
         }
-        
+
         .sales-icon {
-            background-color: rgba(253, 203, 110, 0.2);
-            color: #fdcb6e;
+            background-color: #f3e5f5;
+            color: #7b1fa2;
         }
-        
+
         .revenue-icon {
             background-color: rgba(85, 239, 196, 0.2);
             color: #55efc4;
         }
-        
+
         .table-responsive {
             border-radius: 10px;
             overflow: hidden;
         }
-        
+
+        .table {
+            margin-bottom: 0;
+        }
+
         .table thead {
-            background-color: var(--primary-color);
-            color: white;
+            background-color: #f8f9fa;
         }
-        
-        .badge-success {
-            background-color: var(--success-color);
+
+        .table thead th {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-top: none;
         }
-        
-        .badge-warning {
-            background-color: var(--warning-color);
-            color: var(--dark-color);
+
+        .table tbody td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
         }
-        
-        .badge-danger {
-            background-color: var(--danger-color);
+
+        .badge {
+            padding: 0.5em 1em;
+            font-weight: 500;
         }
-        
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, .075);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .card-title {
+            margin-bottom: 0;
+            color: #344767;
+            font-size: 1.125rem;
+        }
+
         .chart-container {
             height: 300px;
             position: relative;
         }
-        
+
         .navbar-brand {
             font-weight: 700;
             color: var(--primary-color);
         }
-        
+
         .user-profile {
             width: 40px;
             height: 40px;
@@ -146,31 +221,21 @@
         }
     </style>
 </head>
+
 <body>
     <div class="d-flex">
         <!-- Sidebar -->
         <?php
-            include 'includes/sidebar.php';
+        include 'includes/sidebar.php';
         ?>
 
         <!-- Main Content -->
         <div class="main-content">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Dashboard Overview</h2>
-                <div class="d-flex">
-                    <div class="input-group me-3" style="width: 300px;">
-                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                        <input type="text" class="form-control" placeholder="Select date range" id="dateRangePicker">
-                    </div>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-download me-2"></i>Export Report
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stats Cards -->
+            <div class="mb-4">
+                <h2 class="h4 text-gray-900">Dashboard Overview</h2>
+            </div><!-- Stats Cards -->
             <div class="row">
-                <div class="col-md-6 col-lg-3">
+                <div class="col-md-6 col-lg-4">
                     <div class="card stat-card">
                         <div class="card-body">
                             <div class="icon-container users-icon">
@@ -178,31 +243,25 @@
                             </div>
                             <div>
                                 <h6 class="card-subtitle mb-2 text-muted">Total Users</h6>
-                                <h3 class="card-title">8,542</h3>
-                                <div class="text-success small">
-                                    <i class="fas fa-arrow-up"></i> 12.5% from last month
-                                </div>
+                                <h3 class="card-title"><?= number_format($total_users) ?></h3>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3">
+                <div class="col-md-6 col-lg-4">
                     <div class="card stat-card">
                         <div class="card-body">
                             <div class="icon-container photos-icon">
                                 <i class="fas fa-images card-icon"></i>
                             </div>
                             <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Photos Uploaded</h6>
-                                <h3 class="card-title">24,763</h3>
-                                <div class="text-success small">
-                                    <i class="fas fa-arrow-up"></i> 8.3% from last month
-                                </div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total Photos</h6>
+                                <h3 class="card-title"><?= number_format($total_images) ?></h3>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3">
+                <div class="col-md-6 col-lg-4">
                     <div class="card stat-card">
                         <div class="card-body">
                             <div class="icon-container sales-icon">
@@ -210,216 +269,86 @@
                             </div>
                             <div>
                                 <h6 class="card-subtitle mb-2 text-muted">Total Sales</h6>
-                                <h3 class="card-title">1,248</h3>
-                                <div class="text-success small">
-                                    <i class="fas fa-arrow-up"></i> 5.7% from last month
-                                </div>
+                                <h3 class="card-title"><?= number_format($total_sales) ?></h3>
+                                <p class="text-muted mb-0">Revenue: Lkr <?= number_format($total_revenue, 2) ?></p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card stat-card">
-                        <div class="card-body">
-                            <div class="icon-container revenue-icon">
-                                <i class="fas fa-dollar-sign card-icon"></i>
-                            </div>
-                            <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Total Revenue</h6>
-                                <h3 class="card-title">$42,580</h3>
-                                <div class="text-success small">
-                                    <i class="fas fa-arrow-up"></i> 10.2% from last month
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Row -->
-            <div class="row mt-4">
-                <div class="col-lg-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title">Revenue Analytics</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <!-- This would be replaced with an actual chart (Chart.js, etc.) -->
-                                <img src="https://via.placeholder.com/800x300?text=Revenue+Chart" alt="Revenue Chart" class="img-fluid" style="border-radius: 5px;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title">User Distribution</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <!-- This would be replaced with an actual chart (Chart.js, etc.) -->
-                                <img src="https://via.placeholder.com/400x300?text=User+Distribution+Chart" alt="User Distribution Chart" class="img-fluid" style="border-radius: 5px;">
-                            </div>
-                            <div class="mt-3">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Photographers</span>
-                                    <strong>3,128 (37%)</strong>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Buyers</span>
-                                    <strong>5,414 (63%)</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Transactions -->
+            </div> <!-- Recent Orders -->
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="card-title">Recent Transactions</h5>
-                            <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Recent Orders</h5>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Transaction ID</th>
-                                            <th>Photographer</th>
-                                            <th>Buyer</th>
-                                            <th>Photo</th>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
                                             <th>Amount</th>
                                             <th>Date</th>
                                             <th>Status</th>
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php while ($order = $recent_orders->fetch_assoc()): ?>
+                                            <tr>
+                                                <td>#<?= str_pad($order['id'], 5, '0', STR_PAD_LEFT) ?></td>
+                                                <td><?= htmlspecialchars($order['user_name']) ?></td>
+                                                <td>Lkr <?= number_format($order['total_amount'], 2) ?></td>
+                                                <td><?= date('M j, Y', strtotime($order['created_at'])) ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?= $order['status'] === 'completed' ? 'success' : 'warning' ?> rounded-pill">
+                                                        <?= ucfirst($order['status']) ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Photos -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Recently Added Photos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
                                         <tr>
-                                            <td>#LL-5842</td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="user-profile me-2">
-                                                    Sarah Johnson
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/men/22.jpg" class="user-profile me-2">
-                                                    Michael Chen
-                                                </div>
-                                            </td>
-                                            <td>Sunset Beach</td>
-                                            <td>$120</td>
-                                            <td>Jun 12, 2023</td>
-                                            <td><span class="badge bg-success rounded-pill">Completed</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
+                                            <th>Photo</th>
+                                            <th>Title</th>
+                                            <th>Photographer</th>
+                                            <th>Price</th>
+                                            <th>Added Date</th>
                                         </tr>
-                                        <tr>
-                                            <td>#LL-5841</td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/men/65.jpg" class="user-profile me-2">
-                                                    David Wilson
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/women/33.jpg" class="user-profile me-2">
-                                                    Emily Rodriguez
-                                                </div>
-                                            </td>
-                                            <td>Mountain Peak</td>
-                                            <td>$85</td>
-                                            <td>Jun 11, 2023</td>
-                                            <td><span class="badge bg-success rounded-pill">Completed</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>#LL-5840</td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/women/68.jpg" class="user-profile me-2">
-                                                    Jessica Lee
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/men/41.jpg" class="user-profile me-2">
-                                                    Robert Taylor
-                                                </div>
-                                            </td>
-                                            <td>Urban Skyline</td>
-                                            <td>$150</td>
-                                            <td>Jun 10, 2023</td>
-                                            <td><span class="badge bg-warning rounded-pill">Pending</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>#LL-5839</td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/men/75.jpg" class="user-profile me-2">
-                                                    James Brown
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/women/29.jpg" class="user-profile me-2">
-                                                    Olivia Martinez
-                                                </div>
-                                            </td>
-                                            <td>Wildlife Portrait</td>
-                                            <td>$95</td>
-                                            <td>Jun 9, 2023</td>
-                                            <td><span class="badge bg-danger rounded-pill">Failed</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>#LL-5838</td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/women/52.jpg" class="user-profile me-2">
-                                                    Sophia Garcia
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://randomuser.me/api/portraits/men/38.jpg" class="user-profile me-2">
-                                                    Daniel Kim
-                                                </div>
-                                            </td>
-                                            <td>Food Photography</td>
-                                            <td>$65</td>
-                                            <td>Jun 8, 2023</td>
-                                            <td><span class="badge bg-success rounded-pill">Completed</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php while ($photo = $recent_photos->fetch_assoc()): ?>
+                                            <tr>
+                                                <td>
+                                                    <img src="../<?= htmlspecialchars($photo['image_url']) ?>"
+                                                        alt="<?= htmlspecialchars($photo['title']) ?>"
+                                                        class="user-profile">
+                                                </td>
+                                                <td><?= htmlspecialchars($photo['title']) ?></td>
+                                                <td><?= htmlspecialchars($photo['photographer_name']) ?></td>
+                                                <td>Lkr <?= number_format($photo['price'], 2) ?></td>
+                                                <td><?= date('M j, Y', strtotime($photo['created_at'])) ?></td>
+                                            </tr>
+                                        <?php endwhile; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -441,4 +370,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -11,8 +11,10 @@ $user_id = $_SESSION['user_id'];
 // Fetch user's purchased images
 $sql = "SELECT i.*, p.payment_status, p.payment_date 
         FROM images i 
-        INNER JOIN payments p ON i.id = p.image_id 
-        WHERE p.user_id = ? AND p.payment_status = 'completed' 
+        INNER JOIN order_items oi ON i.id = oi.image_id
+        INNER JOIN orders o ON oi.order_id = o.id
+        INNER JOIN payments p ON o.id = p.order_id
+        WHERE o.user_id = ? AND p.payment_status = 'completed' 
         ORDER BY p.payment_date DESC";
 
 $stmt = $conn->prepare($sql);
@@ -49,15 +51,18 @@ $user_data = $user_stmt->get_result()->fetch_assoc();
             <div class="flex items-center space-x-4">
                 <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center">
                     <span class="text-3xl text-white font-bold">
-                        <?php echo strtoupper(substr($user_data['username'], 0, 1)); ?>
+                        <?php echo strtoupper(substr($user_data['name'], 0, 1)); ?>
                     </span>
                 </div>
                 <div class="flex-grow">
-                    <h1 class="text-2xl font-bold text-gray-800"><?php echo htmlspecialchars($user_data['username']); ?>'s Profile</h1>
+                    <h1 class="text-2xl font-bold text-gray-800"><?php echo htmlspecialchars($user_data['name']); ?>'s Profile</h1>
                     <p class="text-gray-600">Member since <?php echo date('F Y', strtotime($user_data['created_at'])); ?></p>
                     <?php
                     // Get count of purchased images
-                    $count_sql = "SELECT COUNT(*) as total FROM payments WHERE user_id = ? AND is_purchased = 1";
+                    $count_sql = "SELECT COUNT(*) as total 
+                                FROM payments p
+                                INNER JOIN orders o ON p.order_id = o.id
+                                WHERE o.user_id = ? AND p.payment_status = 'completed'";
                     $count_stmt = $conn->prepare($count_sql);
                     $count_stmt->bind_param("i", $user_id);
                     $count_stmt->execute();
