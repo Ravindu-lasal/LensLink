@@ -9,7 +9,7 @@
                   </h3>
                   <p class="text-white mb-4">$45.00</p>
                   <button>
-                      <a href="">view Details</a>
+                      <a href="image_details.php?id=<?php echo $imageId; ?>" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full">view Details</a>
                   </button>
               </div>
           </div>

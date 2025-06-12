@@ -15,8 +15,6 @@ if ($imageResult && $imageResult->num_rows > 0) {
     // Handle case where no images are found
     $allImages = [];
 }
-
-var_dump($allImages); // For debugging purposes, remove in production
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -120,6 +118,7 @@ var_dump($allImages); // For debugging purposes, remove in production
                 $imageTitle = htmlspecialchars($image['title']);
                 $imageDescription = htmlspecialchars($image['description']);
                 $imageSrc = htmlspecialchars($image['image_url']);
+                $imageId = $image['id'];
 
                 include 'includes/imageCard.php';
             }
@@ -132,7 +131,7 @@ var_dump($allImages); // For debugging purposes, remove in production
         <div class="container mx-auto px-4">
             <div class="md:flex md:items-center md:space-x-12">
                 <div class="md:w-1/2 mb-8 md:mb-0">
-                    <img src="https://source.unsplash.com/random/600x400/?photography,studio" alt="About PhotoArt" class="rounded-lg shadow-lg w-full">
+                    <img src="./Images/capture.jpg" alt="About PhotoArt" class="rounded-lg shadow-lg w-full">
                 </div>
                 <div class="md:w-1/2">
                     <h2 class="text-3xl font-bold text-gray-800 mb-6">About PhotoArt</h2>

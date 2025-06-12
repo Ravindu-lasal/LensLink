@@ -92,9 +92,11 @@ $result = $conn->query($imgsql);
             <!-- Image Card 1 -->
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="relative overflow-hidden rounded-lg shadow-lg group image-card">
-                    <img src="<?= htmlspecialchars($row['image_url']) ?>"
-                        alt="<?= htmlspecialchars($row['title']) ?>"
-                        class="w-full h-64 object-cover">
+                    <a href="image_details.php?id=<?= $row['id'] ?>">
+                        <img src="<?= htmlspecialchars($row['image_url']) ?>"
+                            alt="<?= htmlspecialchars($row['title']) ?>"
+                            class="w-full h-64 object-cover">
+                    </a>
 
                     <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div class="text-center p-4">
@@ -102,16 +104,18 @@ $result = $conn->query($imgsql);
                             <p class="text-white mb-1">Lkr <?= number_format($row['price'], 2) ?></p>
                             <p class="text-white text-sm mb-4"><?= htmlspecialchars($row['category_name']) ?></p>
                             <div class="flex justify-center space-x-4">
-                                <button onclick="openImageModal('<?= htmlspecialchars($row['image_url']) ?>')"
+                                <a href="image_details.php?id=<?= $row['id'] ?>"
                                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full">
-                                    <i class="fas fa-eye"></i> View
-                                </button>
-                                <button class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full">
-                                    <i class="fas fa-heart"></i> Like
-                                </button>
-                                <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full">
-                                    <i class="fas fa-cart-plus"></i> Buy
-                                </button>
+                                    <i class="fas fa-eye"></i> Details
+                                </a>
+                                <?php if (isset($_SESSION['user_id'])): ?>
+                                    <button class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full">
+                                        <i class="fas fa-heart"></i> Like
+                                    </button>
+                                    <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full">
+                                        <i class="fas fa-cart-plus"></i> Buy
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
