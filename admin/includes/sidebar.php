@@ -26,12 +26,6 @@
                 Photos
             </a>
         </li>
-        <li>
-            <a href="feedback.php" class="nav-link <?= $current_page === 'feedback.php' ? 'active' : '' ?>">
-                <i class="fas fa-comments"></i>
-                Feedbacks
-            </a>
-        </li>
     </ul>
     <hr>
     <div class="dropdown">

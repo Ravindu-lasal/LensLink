@@ -162,41 +162,6 @@ if ($imageResult && $imageResult->num_rows > 0) {
         </div>
     </div>
 
-    <!-- Contact Form Section -->
-    <div class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="max-w-3xl mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Contact Us</h2>
-                    <p class="text-gray-600">Have questions or feedback? We'd love to hear from you!</p>
-                </div>
-                <form class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="name" class="block text-gray-700 mb-2">Your Name</label>
-                            <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                        </div>
-                        <div>
-                            <label for="email" class="block text-gray-700 mb-2">Email Address</label>
-                            <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="subject" class="block text-gray-700 mb-2">Subject</label>
-                        <input type="text" id="subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label for="message" class="block text-gray-700 mb-2">Message</label>
-                        <textarea id="message" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"></textarea>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-medium inline-block">Send Message</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
 
     </div>
 
