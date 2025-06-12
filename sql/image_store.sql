@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `images` (
   `image_url` varchar(255) NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `category` varchar(50) DEFAULT NULL,
+  `is_public` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
