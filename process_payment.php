@@ -95,7 +95,7 @@ try {
         $order_items_stmt->bind_param("iid", $order_id, $item['image_id'], $item['price']);
         $order_items_stmt->execute();
     }    // Create payment record
-    $payment_sql = "INSERT INTO payments (order_id, amount, payment_method, status) 
+    $payment_sql = "INSERT INTO payments (order_id, amount, payment_method, payment_status) 
                     VALUES (?, ?, 'credit_card', 'completed')";
     $payment_stmt = $conn->prepare($payment_sql);
     $payment_stmt->bind_param("id", $order_id, $total);
