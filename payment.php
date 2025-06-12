@@ -1,6 +1,42 @@
 <?php
+require_once 'config/db_conn.php';
 require_once 'config/auth_check.php';
+session_start();
 checkUserAuth();
+
+$user_id = $_SESSION['user_id'];
+
+// Fetch cart items
+$sql = "SELECT cart_items.*, images.title, images.image_url, images.price 
+        FROM cart_items 
+        JOIN images ON cart_items.image_id = images.id 
+        WHERE cart_items.user_id = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Calculate total
+$total = 0;
+$cart_items = [];
+while ($row = $result->fetch_assoc()) {
+    $cart_items[] = $row;
+    $total += $row['price'];
+}
+
+// If cart is empty, redirect back to cart page
+if (empty($cart_items)) {
+    header('Location: cart.php');
+    exit();
+}
+
+// Fetch user details for pre-filling the form
+$user_sql = "SELECT name, email FROM users WHERE id = ?";
+$user_stmt = $conn->prepare($user_sql);
+$user_stmt->bind_param("i", $user_id);
+$user_stmt->execute();
+$user = $user_stmt->get_result()->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="en">

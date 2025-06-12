@@ -102,11 +102,11 @@ while ($row = $result->fetch_assoc()) {
                     <div class="flex justify-between mb-6">
                         <span class="font-semibold text-sm">Total</span>
                         <span class="font-bold text-xl">Lkr <?= number_format($total, 2) ?></span>
-                    </div>
-                    <?php if (!empty($cart_items)): ?>
-                        <button onclick="window.location.href='checkout.php'"
+                    </div> <?php if (!empty($cart_items)): ?>
+                        <button onclick="window.location.href='payment.php'"
                             class="bg-blue-600 text-white w-full px-6 py-3 rounded-lg hover:bg-blue-700">
-                            Proceed to Checkout
+                            <i class="fas fa-credit-card mr-2"></i>
+                            Proceed to Payment
                         </button>
                     <?php endif; ?>
                 </div>
