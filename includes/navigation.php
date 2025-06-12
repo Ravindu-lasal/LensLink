@@ -22,6 +22,7 @@ $cart_count = isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0;
                     <a href="index.php" class="py-4 px-2 <?php echo $current_page == 'index.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Home</a>
                     <a href="gallery.php" class="py-4 px-2 <?php echo $current_page == 'gallery.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Gallery</a>
                     <?php if (isset($_SESSION['user_id'])) { ?>
+                        <a href="uploads.php" class="py-4 px-2 <?php echo $current_page == 'uploads.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Uploads</a>
                         <a href="favorites.php" class="py-4 px-2 <?php echo $current_page == 'favorites.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Favorites</a>
                     <?php } ?>
                 </div>
@@ -74,7 +75,6 @@ $cart_count = isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0;
                 <li><a href="uploads.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Uploads</a></li>
                 <li><a href="favorites.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Favorites</a></li>
                 <li><a href="profile.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Profile</a></li>
-                <li><a href="payment.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Payments</a></li>
             <?php } ?>
             <li><a href="signin.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign In</a></li>
             <li><a href="signup.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign Up</a></li>
