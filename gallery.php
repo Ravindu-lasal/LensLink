@@ -13,17 +13,42 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: signin.php');
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
 $imgsql = "SELECT images.*, categories.name AS category_name FROM images 
         LEFT JOIN categories ON images.category_id = categories.id 
-        WHERE is_public = 1 ORDER BY created_at DESC";
+        WHERE images.user_id = ? ORDER BY created_at DESC";
 
-$result = $conn->query($imgsql);
+$stmt = $conn->prepare($imgsql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Debug information
+echo "<!-- Debug: Number of images found: " . $result->num_rows . " -->";
+
+// Store all results in an array for debugging
+$all_images = [];
+while ($row = $result->fetch_assoc()) {
+    $all_images[] = $row;
+}
+echo "<!-- Debug: Image IDs found: " . implode(', ', array_column($all_images, 'id')) . " -->";
+
+// Reset the result pointer to the beginning
+mysqli_data_seek($result, 0);
 
 ?>
 
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,19 +60,64 @@ $result = $conn->query($imgsql);
         .image-card:hover .image-overlay {
             opacity: 1;
         }
+
         .modal {
             transition: opacity 0.3s ease-in-out;
         }
     </style>
+    <script>
+        function showMessage(message, isSuccess) {
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.textContent = message;
+            messageContainer.className = `mb-4 p-4 rounded-lg ${isSuccess ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            messageContainer.classList.remove('hidden');
+            setTimeout(() => {
+                messageContainer.classList.add('hidden');
+            }, 3000);
+        }
+
+        function deleteImage(imageId) {
+            if (confirm('Are you sure you want to delete this image?')) {
+                fetch('delete_image.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            image_id: imageId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the image card from the UI
+                            const imageCard = document.querySelector(`[data-image-id="${imageId}"]`);
+                            if (imageCard) {
+                                imageCard.remove();
+                                showMessage('Image deleted successfully', true);
+                            }
+                        } else {
+                            showMessage('Error deleting image: ' + data.message, false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showMessage('Error deleting image', false);
+                    });
+            }
+        }
+    </script>
 </head>
+
 <body class="bg-gray-50">
     <!-- Navigation -->
-     <?php
-       include('includes/navigation.php');
-     ?>
-
-    <!-- Gallery Page Content -->
+    <?php
+    include('includes/navigation.php');
+    ?> <!-- Gallery Page Content -->
     <div class="container mx-auto px-4 py-8">
+        <!-- Success/Error Message Container -->
+        <div id="messageContainer" class="hidden mb-4 p-4 rounded-lg"></div>
+
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800">My Photo Gallery</h1>
             <?php
@@ -58,7 +128,7 @@ $result = $conn->query($imgsql);
             }
             ?>
         </div>
-        
+
         <!-- Search and Filter -->
         <div class="flex flex-col md:flex-row justify-between mb-8">
             <div class="relative mb-4 md:mb-0">
@@ -82,41 +152,36 @@ $result = $conn->query($imgsql);
                     <option>Price: High to Low</option>
                 </select>
             </div>
-        </div>
-        
-        <!-- Image Grid -->
+        </div> <!-- Image Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <!-- Image Card 1 -->
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="relative overflow-hidden rounded-lg shadow-lg group image-card">
-                    <img src="<?= htmlspecialchars($row['image_url']) ?>" 
-                        alt="<?= htmlspecialchars($row['title']) ?>" 
-                        class="w-full h-64 object-cover">
-
-                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <?php
+            $count = 0;
+            while ($row = $result->fetch_assoc()):
+                $count++;
+                echo "<!-- Debug: Processing image #{$count}, ID: {$row['id']} -->";
+            ?><div class="relative overflow-hidden rounded-lg shadow-lg group image-card" data-image-id="<?= $row['id'] ?>">
+                    <a href="image_details.php?id=<?= $row['id'] ?>">
+                        <img src="<?= htmlspecialchars($row['image_url']) ?>"
+                            alt="<?= htmlspecialchars($row['title']) ?>"
+                            class="w-full h-64 object-cover">
+                    </a>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button onclick="deleteImage(<?= $row['id'] ?>)" class="text-white hover:text-red-400 p-4">
+                            <i class="fas fa-trash text-3xl mb-2"></i>
+                            <br>Remove Image
+                        </button>
                         <div class="text-center p-4">
                             <h3 class="text-white font-bold text-xl mb-2"><?= htmlspecialchars($row['title']) ?></h3>
-                            <p class="text-white mb-1">Lkr <?= number_format($row['price'], 2) ?></p>
-                            <p class="text-white text-sm mb-4"><?= htmlspecialchars($row['category_name']) ?></p>
-                            <div class="flex justify-center space-x-4">
-                                <button onclick="openImageModal('<?= htmlspecialchars($row['image_url']) ?>')" 
-                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full">
-                                    <i class="fas fa-eye"></i> View
-                                </button>
-                                <button class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full">
-                                    <i class="fas fa-heart"></i> Like
-                                </button>
-                                <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full">
-                                    <i class="fas fa-cart-plus"></i> Buy
-                                </button>
-                            </div>
+                            <p class="text-white text-sm mb-2"><?= htmlspecialchars($row['category_name']) ?></p>
+                            <p class="text-white">Lkr <?= number_format($row['price'], 2) ?></p>
                         </div>
                     </div>
                 </div>
             <?php endwhile; ?>
-            
+
         </div>
-        
+
         <!-- Pagination -->
         <div class="flex justify-center mt-10">
             <nav class="inline-flex rounded-md shadow">
@@ -139,9 +204,9 @@ $result = $conn->query($imgsql);
         </div>
     </div>
 
-   <?php
-   include 'includes/footer.php'
-   ?>
+    <?php
+    include 'includes/footer.php'
+    ?>
 
     <!-- Image Preview Modal -->
     <div id="imageModal" class="fixed inset-0 z-50 hidden modal">
@@ -195,13 +260,11 @@ $result = $conn->query($imgsql);
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Upload Image Modal -->
-    <div id="uploadModal" class="fixed inset-0 z-50 hidden modal">
+    </div> <!-- Upload Image Modal -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden modal overflow-y-auto">
         <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeUploadModal()"></div>
         <div class="relative max-w-2xl mx-auto my-8 p-4">
-            <div class="bg-white rounded-lg p-6">
+            <div class="bg-white rounded-lg p-6 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Upload New Image</h2>
                     <button onclick="closeUploadModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
@@ -221,7 +284,7 @@ $result = $conn->query($imgsql);
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2" for="imageCategory">Category</label>
                         <select id="imageCategory" name="imageCategory" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
-                             <option value="">-- Select Category --</option>
+                            <option value="">-- Select Category --</option>
                             <?php foreach ($categories as $category): ?>
                                 <option value="<?= htmlspecialchars($category['id']) ?>">
                                     <?= htmlspecialchars($category['name']) ?>
@@ -267,7 +330,7 @@ $result = $conn->query($imgsql);
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
-        
+
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
@@ -320,4 +383,5 @@ $result = $conn->query($imgsql);
         });
     </script>
 </body>
+
 </html>

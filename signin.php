@@ -2,8 +2,12 @@
 session_start();
 require_once 'config/db_conn.php';
 
+// Store redirect URL if provided
+$redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '';
+$_SESSION['redirect_after_login'] = $redirect;
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    
+
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
 
@@ -12,9 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: signin.php");
         exit();
     }
-
-   
-    $stmt = $conn->prepare("SELECT id, name, email, password_hash, role FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, name, email, password FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -22,15 +24,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
 
-        
-        if (password_verify($password, $user['password_hash'])) {
+        if (password_verify($password, $user['password'])) {
             // Set session variables
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['user_email'] = $user['email'];
 
-            // Redirect to dashboard or homepage
+            // Redirect to stored URL or homepage
+            if (!empty($_SESSION['redirect_after_login'])) {
+                $redirect_url = $_SESSION['redirect_after_login'];
+                unset($_SESSION['redirect_after_login']); // Clear the stored URL
+                header("Location: " . $redirect_url);
+                exit();
+            }
+
             header("Location: index.php");
             exit();
         } else {
@@ -52,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,10 +68,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="bg-gray-50">
     <!-- Navigation -->
     <?php
-        include 'includes/navigation.php';
+    include 'includes/navigation.php';
     ?>
 
     <!-- Sign In Form -->
@@ -120,52 +130,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         Sign in
                     </button>
                 </div>
-                
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">
-                            Or continue with
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-3 gap-3">
-                    <div>
-                        <button type="button"
-                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <i class="fab fa-google text-red-500"></i>
-                        </button>
-                    </div>
-                    <div>
-                        <button type="button"
-                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <i class="fab fa-facebook-f text-blue-600"></i>
-                        </button>
-                    </div>
-                    <div>
-                        <button type="button"
-                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <i class="fab fa-twitter text-blue-400"></i>
-                        </button>
-                    </div>
-                </div>
             </form>
         </div>
     </div>
 
     <!-- Footer -->
-     <?php
-     include 'includes/footer.php';
+    <?php
+    include 'includes/footer.php';
     ?>
 
     <script>
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
-        
+
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
@@ -173,13 +151,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Form validation
         const form = document.querySelector('form');
         form.addEventListener('submit', function(e) {
-           
+
             const email = document.getElementById('email-address').value;
             const password = document.getElementById('password').value;
-            
+
             // Simple validation
             if (!email || !password) {
-                 e.preventDefault();
+                e.preventDefault();
                 alert('Please fill in all fields');
                 return;
             }
@@ -187,4 +165,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         });
     </script>
 </body>
+
 </html>

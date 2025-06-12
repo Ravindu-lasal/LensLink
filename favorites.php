@@ -1,5 +1,10 @@
+<?php
+require_once 'config/auth_check.php';
+checkUserAuth();
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,63 +18,12 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between">
-                <div class="flex space-x-7">
-                    <div>
-                        <!-- Logo -->
-                        <a href="index.html" class="flex items-center py-4 px-2">
-                            <span class="font-semibold text-gray-900 text-2xl">
-                                <i class="fas fa-camera-retro mr-2 text-blue-600"></i>LensLink
-                            </span>
-                        </a>
-                    </div>
-                    <!-- Primary Navbar items -->
-                    <div class="hidden md:flex items-center space-x-1">
-                        <a href="index.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Home</a>
-                        <a href="gallery.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Gallery</a>
-                        <a href="favorites.html" class="py-4 px-2 text-blue-600 border-b-4 border-blue-600">Favorites</a>
-                        <a href="payment.html" class="py-4 px-2 text-gray-700 hover:text-blue-600 transition duration-300">Payments</a>
-                    </div>
-                </div>
-                <!-- Secondary Navbar items -->
-                <div class="hidden md:flex items-center space-x-3">
-                    <a href="signin.html" class="py-2 px-2 font-medium text-gray-700 hover:text-blue-600 transition duration-300">Sign In</a>
-                    <a href="signup.html" class="py-2 px-2 font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition duration-300">Sign Up</a>
-                </div>
-                <!-- Mobile menu button -->
-                <div class="md:hidden flex items-center">
-                    <button class="outline-none mobile-menu-button">
-                        <svg class="w-6 h-6 text-gray-700 hover:text-blue-600"
-                            x-show="!showMenu"
-                            fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile menu -->
-        <div class="hidden mobile-menu">
-            <ul class="">
-                <li><a href="index.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Home</a></li>
-                <li><a href="gallery.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Gallery</a></li>
-                <li class="active"><a href="favorites.html" class="block text-sm px-2 py-4 text-white bg-blue-600 font-semibold">Favorites</a></li>
-                <li><a href="payment.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Cart</a></li>
-                <li><a href="signin.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign In</a></li>
-                <li><a href="signup.html" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign Up</a></li>
-            </ul>
-        </div>
-    </nav>
+    <?php
+    include('includes/navigation.php');
+    ?>
 
     <!-- Favorites Page Content -->
     <div class="container mx-auto px-4 py-8">
@@ -79,7 +33,7 @@
                 <i class="fas fa-trash-alt mr-2"></i> Clear All
             </button>
         </div>
-        
+
         <!-- Message when no favorites -->
         <div id="noFavoritesMessage" class="text-center py-12 hidden">
             <i class="fas fa-heart text-5xl text-gray-300 mb-4"></i>
@@ -89,7 +43,7 @@
                 <i class="fas fa-images mr-2"></i> Browse Gallery
             </a>
         </div>
-        
+
         <!-- Favorites Grid -->
         <div id="favoritesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <!-- Favorites will be loaded here dynamically -->
@@ -150,7 +104,7 @@
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
-        
+
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
@@ -163,19 +117,19 @@
         function loadFavorites() {
             const favoritesGrid = document.getElementById('favoritesGrid');
             const noFavoritesMessage = document.getElementById('noFavoritesMessage');
-            
+
             // Get favorites from localStorage
             const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-            
+
             if (favorites.length === 0) {
                 favoritesGrid.classList.add('hidden');
                 noFavoritesMessage.classList.remove('hidden');
                 return;
             }
-            
+
             favoritesGrid.innerHTML = '';
             noFavoritesMessage.classList.add('hidden');
-            
+
             favorites.forEach((favorite, index) => {
                 const favoriteCard = document.createElement('div');
                 favoriteCard.className = 'relative overflow-hidden rounded-lg shadow-lg group image-card';
@@ -224,4 +178,5 @@
         }
     </script>
 </body>
+
 </html>
