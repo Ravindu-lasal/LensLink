@@ -3,7 +3,7 @@ require_once 'config/db_conn.php';
 require_once 'config/auth_check.php';
 
 if (!isset($_POST['image_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Image ID is required']);
+    header('Location: gallery.php');
     exit();
 }
 
@@ -22,13 +22,15 @@ if ($result->num_rows > 0) {
     $delete_sql = "DELETE FROM favorites WHERE user_id = ? AND image_id = ?";
     $stmt = $conn->prepare($delete_sql);
     $stmt->bind_param("ii", $user_id, $image_id);
-    $success = $stmt->execute();
-    echo json_encode(['success' => $success, 'isFavorited' => false]);
+    $stmt->execute();
 } else {
     // Add to favorites
     $insert_sql = "INSERT INTO favorites (user_id, image_id) VALUES (?, ?)";
     $stmt = $conn->prepare($insert_sql);
     $stmt->bind_param("ii", $user_id, $image_id);
-    $success = $stmt->execute();
-    echo json_encode(['success' => $success, 'isFavorited' => true]);
+    $stmt->execute();
 }
+
+// Redirect back to the image details page
+header("Location: image_details.php?id=" . $image_id);
+exit();

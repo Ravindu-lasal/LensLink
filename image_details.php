@@ -106,11 +106,14 @@ $related_images = $stmt->get_result();
                         <p class="text-3xl font-bold text-blue-600">Lkr <?= number_format($image['price'], 2) ?></p>
                         <p class="text-sm text-gray-500">Includes commercial license</p>
                     </div> <?php if (isset($_SESSION['user_id'])): ?>
-                        <button type="button" id="favButton" onclick="toggleFavorite(<?= $image_id ?>)"
-                            class="mb-4 flex items-center justify-center w-full px-4 py-2 text-sm font-medium rounded-md <?= $is_favorited ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700' ?> hover:bg-opacity-90 transition-colors">
-                            <i id="favIcon" class="fas fa-heart mr-2"></i>
-                            <span id="favText"><?= $is_favorited ? 'Remove from Favorites' : 'Add to Favorites' ?></span>
-                        </button>
+                        <form method="POST" action="toggle_favorite.php">
+                            <input type="hidden" name="image_id" value="<?= $image_id ?>">
+                            <button type="submit"
+                                class="mb-4 flex items-center justify-center w-full px-4 py-2 text-sm font-medium rounded-md <?= $is_favorited ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700' ?> hover:bg-opacity-90 transition-colors">
+                                <i class="fas fa-heart mr-2"></i>
+                                <span><?= $is_favorited ? 'Remove from Favorites' : 'Add to Favorites' ?></span>
+                            </button>
+                        </form>
                     <?php endif; ?>
 
                     <div class="space-y-4">
@@ -215,39 +218,6 @@ $related_images = $stmt->get_result();
                     messageDiv.classList.add('bg-red-100', 'text-red-700');
                     messageDiv.textContent = 'Error adding item to cart';
                 });
-        } // Favorite button functionality
-        async function toggleFavorite(imageId) {
-            try {
-                const response = await fetch('toggle_favorite.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `image_id=${imageId}`
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    const btn = document.getElementById('favButton');
-                    const text = document.getElementById('favText');
-
-                    if (data.isFavorited) {
-                        btn.classList.remove('bg-gray-100', 'text-gray-700');
-                        btn.classList.add('bg-red-100', 'text-red-700');
-                        text.textContent = 'Remove from Favorites';
-                    } else {
-                        btn.classList.remove('bg-red-100', 'text-red-700');
-                        btn.classList.add('bg-gray-100', 'text-gray-700');
-                        text.textContent = 'Add to Favorites';
-                    }
-                } else {
-                    alert('Could not update favorite status. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            }
         }
     </script>
 </body>
