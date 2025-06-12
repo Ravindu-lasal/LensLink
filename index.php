@@ -5,7 +5,11 @@ include_once 'config/db_conn.php';
 
 $allImages = [];
 
-$imageSql = "SELECT * FROM images WHERE is_public = 1 ORDER BY created_at DESC";
+$imageSql = "SELECT i.*, u.name as photographer FROM images i 
+            LEFT JOIN users u ON i.user_id = u.id 
+            WHERE i.is_public = 1 
+            ORDER BY i.created_at DESC 
+            LIMIT 3";
 $imageResult = $conn->query($imageSql);
 if ($imageResult && $imageResult->num_rows > 0) {
     while ($row = $imageResult->fetch_assoc()) {
