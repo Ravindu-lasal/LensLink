@@ -95,6 +95,16 @@ try {
         $order_items_stmt->execute();
     }
 
+    // Mark images as purchased
+    $payment_sql = "INSERT INTO payments (user_id, image_id, amount, payment_status, payment_date, is_purchased) 
+                    VALUES (?, ?, ?, 'completed', NOW(), 1)";
+    $payment_stmt = $conn->prepare($payment_sql);
+
+    foreach ($cart_items as $item) {
+        $payment_stmt->bind_param("iid", $user_id, $item['image_id'], $item['price']);
+        $payment_stmt->execute();
+    }
+
     // Clear cart
     $clear_cart_sql = "DELETE FROM cart_items WHERE user_id = ?";
     $clear_cart_stmt = $conn->prepare($clear_cart_sql);
