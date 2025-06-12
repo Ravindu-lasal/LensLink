@@ -77,7 +77,7 @@ $user = $user_stmt->get_result()->fetch_assoc();
                     <!-- Payment Method Selection -->
                     <div class="mb-8">
                         <h3 class="text-lg font-semibold text-gray-700 mb-4">Payment Method</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 gap-4">
                             <!-- Credit Card -->
                             <div>
                                 <input type="radio" id="credit-card" name="payment-method" value="credit-card" class="hidden payment-method" checked>
@@ -86,154 +86,27 @@ $user = $user_stmt->get_result()->fetch_assoc();
                                     <span class="font-medium">Credit Card</span>
                                 </label>
                             </div>
-                            <!-- PayPal -->
-                            <div>
-                                <input type="radio" id="paypal" name="payment-method" value="paypal" class="hidden payment-method">
-                                <label for="paypal" class="payment-label block border-2 border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition duration-200">
-                                    <i class="fab fa-paypal text-3xl text-blue-600 mb-2"></i>
-                                    <span class="font-medium">PayPal</span>
-                                </label>
-                            </div>
-                            <!-- Bank Transfer -->
-                            <div>
-                                <input type="radio" id="bank-transfer" name="payment-method" value="bank-transfer" class="hidden payment-method">
-                                <label for="bank-transfer" class="payment-label block border-2 border-gray-200 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition duration-200">
-                                    <i class="fas fa-university text-3xl text-blue-600 mb-2"></i>
-                                    <span class="font-medium">Bank Transfer</span>
-                                </label>
-                            </div>
                         </div>
                     </div>
 
                     <!-- Credit Card Form (shown by default) -->
                     <div id="credit-card-form">
-                        <div class="mb-6">
-                            <label for="card-number" class="block text-gray-700 font-medium mb-2">Card Number</label>
-                            <div class="relative">
-                                <input type="text" id="card-number" placeholder="1234 5678 9012 3456" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent card-input">
-                                <div class="absolute right-3 top-3 text-gray-400 card-icon">
-                                    <i class="far fa-credit-card"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <label for="card-expiry" class="block text-gray-700 font-medium mb-2">Expiry Date</label>
-                                <input type="text" id="card-expiry" placeholder="MM/YY" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="col-span-2">
+                                <label for="card-number" class="block text-sm font-medium text-gray-700">Card Number</label>
+                                <input type="text" id="card-number" name="card-number" class="mt-1 block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" maxlength="19" required>
                             </div>
                             <div>
-                                <label for="card-cvc" class="block text-gray-700 font-medium mb-2">CVC/CVV</label>
-                                <div class="relative">
-                                    <input type="text" id="card-cvc" placeholder="123" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                                    <div class="absolute right-3 top-3 text-gray-400">
-                                        <i class="fas fa-question-circle" title="3-digit code on back of card"></i>
-                                    </div>
-                                </div>
+                                <label for="expiry" class="block text-sm font-medium text-gray-700">Expiry Date</label>
+                                <input type="text" id="expiry" name="expiry" placeholder="MM/YY" class="mt-1 block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" maxlength="5" required>
                             </div>
-                        </div>
-
-                        <div class="mb-6">
-                            <label for="card-name" class="block text-gray-700 font-medium mb-2">Name on Card</label>
-                            <input type="text" id="card-name" placeholder="John Smith" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                        </div>
-                    </div>
-
-                    <!-- PayPal Form (hidden by default) -->
-                    <div id="paypal-form" class="hidden">
-                        <div class="bg-gray-100 p-6 rounded-lg text-center">
-                            <p class="text-gray-700 mb-4">You will be redirected to PayPal to complete your payment securely.</p>
-                            <button type="button" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium py-3 px-6 rounded-lg transition duration-200">
-                                <i class="fab fa-paypal mr-2"></i> Proceed to PayPal
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Bank Transfer Form (hidden by default) -->
-                    <div id="bank-transfer-form" class="hidden">
-                        <div class="bg-gray-100 p-6 rounded-lg">
-                            <p class="text-gray-700 mb-4">Please use the following bank details to complete your transfer:</p>
-                            <div class="space-y-3">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Bank Name:</span>
-                                    <span class="font-medium">PhotoArt Bank</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Account Name:</span>
-                                    <span class="font-medium">PhotoArt Inc.</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Account Number:</span>
-                                    <span class="font-medium">1234567890</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">IBAN:</span>
-                                    <span class="font-medium">US12 3456 7890 1234 5678 90</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">SWIFT/BIC:</span>
-                                    <span class="font-medium">PHARUS33</span>
-                                </div>
+                            <div>
+                                <label for="cvv" class="block text-sm font-medium text-gray-700">CVV</label>
+                                <input type="text" id="cvv" name="cvv" class="mt-1 block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" maxlength="4" required>
                             </div>
-                            <p class="text-gray-700 mt-4 text-sm">Please include your order number as the payment reference.</p>
-                        </div>
-                    </div>
-
-                    <!-- Billing Address -->
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Billing Address</h3>
-
-                        <div class="mb-4">
-                            <label class="inline-flex items-center">
-                                <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600" checked>
-                                <span class="ml-2 text-gray-700">Same as shipping address</span>
-                            </label>
-                        </div>
-
-                        <div id="billing-address-fields" class="hidden">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <label for="billing-first-name" class="block text-gray-700 font-medium mb-2">First Name</label>
-                                    <input type="text" id="billing-first-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                                </div>
-                                <div>
-                                    <label for="billing-last-name" class="block text-gray-700 font-medium mb-2">Last Name</label>
-                                    <input type="text" id="billing-last-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                                </div>
-                            </div>
-
-                            <div class="mb-6">
-                                <label for="billing-address" class="block text-gray-700 font-medium mb-2">Address</label>
-                                <input type="text" id="billing-address" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent mb-2">
-                                <input type="text" id="billing-address2" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                                <div>
-                                    <label for="billing-city" class="block text-gray-700 font-medium mb-2">City</label>
-                                    <input type="text" id="billing-city" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                                </div>
-                                <div>
-                                    <label for="billing-state" class="block text-gray-700 font-medium mb-2">State/Province</label>
-                                    <input type="text" id="billing-state" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                                </div>
-                                <div>
-                                    <label for="billing-zip" class="block text-gray-700 font-medium mb-2">ZIP/Postal Code</label>
-                                    <input type="text" id="billing-zip" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                                </div>
-                            </div>
-
-                            <div class="mb-6">
-                                <label for="billing-country" class="block text-gray-700 font-medium mb-2">Country</label>
-                                <select id="billing-country" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                                    <option>United States</option>
-                                    <option>Canada</option>
-                                    <option>United Kingdom</option>
-                                    <option>Australia</option>
-                                    <option>Germany</option>
-                                    <option>France</option>
-                                    <option>Other</option>
-                                </select>
+                            <div class="col-span-2">
+                                <label for="card-name" class="block text-sm font-medium text-gray-700">Name on Card</label>
+                                <input type="text" id="card-name" name="card-name" class="mt-1 block w-full px-4 py-3 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
                             </div>
                         </div>
                     </div>
@@ -307,18 +180,7 @@ $user = $user_stmt->get_result()->fetch_assoc();
                             <span>Total</span>
                             <span>Lkr <?= number_format($total, 2) ?></span>
                         </div>
-                    </div>
-
-                    <!-- Promo Code -->
-                    <div class="mb-6">
-                        <label for="promo-code" class="block text-gray-700 font-medium mb-2">Promo Code</label>
-                        <div class="flex">
-                            <input type="text" id="promo-code" placeholder="Enter code" class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
-                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-r-lg transition duration-200">Apply</button>
-                        </div>
-                    </div>
-
-                    <!-- Help Link -->
+                    </div> <!-- Help Link -->
                     <div class="text-center">
                         <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Need help? Contact our support</a>
                     </div>
@@ -344,37 +206,17 @@ $user = $user_stmt->get_result()->fetch_assoc();
         // Payment method toggle
         const paymentMethods = document.querySelectorAll('.payment-method');
         const creditCardForm = document.getElementById('credit-card-form');
-        const paypalForm = document.getElementById('paypal-form');
-        const bankTransferForm = document.getElementById('bank-transfer-form');
 
         paymentMethods.forEach(method => {
             method.addEventListener('change', function() {
                 // Hide all forms first
                 creditCardForm.classList.add('hidden');
-                paypalForm.classList.add('hidden');
-                bankTransferForm.classList.add('hidden');
 
                 // Show the selected form
                 if (this.value === 'credit-card') {
                     creditCardForm.classList.remove('hidden');
-                } else if (this.value === 'paypal') {
-                    paypalForm.classList.remove('hidden');
-                } else if (this.value === 'bank-transfer') {
-                    bankTransferForm.classList.remove('hidden');
                 }
             });
-        });
-
-        // Billing address toggle
-        const sameAsShippingCheckbox = document.querySelector('input[type="checkbox"]');
-        const billingAddressFields = document.getElementById('billing-address-fields');
-
-        sameAsShippingCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                billingAddressFields.classList.add('hidden');
-            } else {
-                billingAddressFields.classList.remove('hidden');
-            }
         });
 
         // Format card number input
@@ -391,7 +233,7 @@ $user = $user_stmt->get_result()->fetch_assoc();
         });
 
         // Format expiry date input
-        const expiryInput = document.getElementById('card-expiry');
+        const expiryInput = document.getElementById('expiry');
         expiryInput.addEventListener('input', function(e) {
             // Remove all non-digit characters
             let value = this.value.replace(/\D/g, '');
