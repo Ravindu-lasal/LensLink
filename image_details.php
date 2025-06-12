@@ -83,17 +83,19 @@ $related_images = $stmt->get_result();
                         <p class="text-3xl font-bold text-blue-600">Lkr <?= number_format($image['price'], 2) ?></p>
                         <p class="text-sm text-gray-500">Includes commercial license</p>
                     </div>
-
                     <div class="space-y-4">
                         <?php if (isset($_SESSION['user_id'])): ?>
-                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
+                            <button onclick="addToCart(<?= $image['id'] ?>)"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-cart-plus mr-2"></i> Add to Cart
                             </button>
                             <button class="w-full bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-heart mr-2"></i> Add to Favorites
                             </button>
+                            <div id="addToCartMessage" class="hidden text-center p-2 rounded-lg"></div>
                         <?php else: ?>
-                            <a href="signin.php" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
+                            <a href="signin.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-sign-in-alt mr-2"></i> Sign in to Purchase
                             </a>
                         <?php endif; ?>
@@ -137,10 +139,50 @@ $related_images = $stmt->get_result();
     <?php include('includes/footer.php'); ?>
 
     <script>
-        // Add any necessary JavaScript here
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize any necessary functionality
-        });
+        function addToCart(imageId) {
+            fetch('add_to_cart.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image_id: imageId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const messageDiv = document.getElementById('addToCartMessage');
+                    messageDiv.classList.remove('hidden');
+
+                    if (data.success) {
+                        // Update cart count in navigation
+                        const cartCountSpan = document.querySelector('.fa-shopping-cart + span');
+                        if (cartCountSpan) {
+                            cartCountSpan.textContent = data.cart_count;
+                        }
+
+                        messageDiv.classList.remove('bg-red-100', 'text-red-700');
+                        messageDiv.classList.add('bg-green-100', 'text-green-700');
+                        messageDiv.textContent = data.message;
+                    } else {
+                        messageDiv.classList.remove('bg-green-100', 'text-green-700');
+                        messageDiv.classList.add('bg-red-100', 'text-red-700');
+                        messageDiv.textContent = data.message;
+                    }
+
+                    // Hide message after 3 seconds
+                    setTimeout(() => {
+                        messageDiv.classList.add('hidden');
+                    }, 3000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const messageDiv = document.getElementById('addToCartMessage');
+                    messageDiv.classList.remove('hidden', 'bg-green-100', 'text-green-700');
+                    messageDiv.classList.add('bg-red-100', 'text-red-700');
+                    messageDiv.textContent = 'Error adding item to cart';
+                });
+        }
     </script>
 </body>
 
