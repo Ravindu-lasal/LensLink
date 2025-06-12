@@ -31,6 +31,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['user_email'] = $user['email'];
 
+            if ($user['email'] === 'admin@gmail.com') {
+                header("Location: admin/dashboard.php");
+                exit();
+            }
+
             // Redirect to stored URL or homepage
             if (!empty($_SESSION['redirect_after_login'])) {
                 $redirect_url = $_SESSION['redirect_after_login'];

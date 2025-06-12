@@ -149,52 +149,9 @@
 <body>
     <div class="d-flex">
         <!-- Sidebar -->
-        <div class="sidebar d-flex flex-column flex-shrink-0 p-3" style="width: 250px;">
-            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                <i class="fas fa-camera-retro fa-2x me-2"></i>
-                <span class="fs-4">LensLink Admin</span>
-            </a>
-            <hr>
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item">
-                    <a href="dashboard.html" class="nav-link active">
-                        <i class="fas fa-tachometer-alt"></i>
-                        Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="user.html" class="nav-link">
-                        <i class="fas fa-users"></i>
-                        Users
-                    </a>
-                </li>
-                <li>
-                    <a href="photos.html" class="nav-link">
-                        <i class="fas fa-images"></i>
-                        Photos
-                    </a>
-                </li>
-                <li>
-                    <a href="feedback.html" class="nav-link">
-                        <i class="fas fa-shopping-cart"></i>
-                        Feedbacks
-                    </a>
-                </li>
-            </ul>
-            <hr>
-            <div class="dropdown">
-                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Admin" class="rounded-circle me-2" width="32" height="32">
-                    <strong>Admin</strong>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li><a class="dropdown-item" href="#">Settings</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Sign out</a></li>
-                </ul>
-            </div>
-        </div>
+        <?php
+            include 'includes/sidebar.php';
+        ?>
 
         <!-- Main Content -->
         <div class="main-content">
