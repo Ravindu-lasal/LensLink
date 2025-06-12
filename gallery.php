@@ -13,11 +13,35 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: signin.php');
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
 $imgsql = "SELECT images.*, categories.name AS category_name FROM images 
         LEFT JOIN categories ON images.category_id = categories.id 
-        WHERE is_public = 1 ORDER BY created_at DESC";
+        WHERE images.user_id = ? ORDER BY created_at DESC";
 
-$result = $conn->query($imgsql);
+$stmt = $conn->prepare($imgsql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Debug information
+echo "<!-- Debug: Number of images found: " . $result->num_rows . " -->";
+
+// Store all results in an array for debugging
+$all_images = [];
+while ($row = $result->fetch_assoc()) {
+    $all_images[] = $row;
+}
+echo "<!-- Debug: Image IDs found: " . implode(', ', array_column($all_images, 'id')) . " -->";
+
+// Reset the result pointer to the beginning
+mysqli_data_seek($result, 0);
 
 ?>
 
@@ -41,16 +65,59 @@ $result = $conn->query($imgsql);
             transition: opacity 0.3s ease-in-out;
         }
     </style>
+    <script>
+        function showMessage(message, isSuccess) {
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.textContent = message;
+            messageContainer.className = `mb-4 p-4 rounded-lg ${isSuccess ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            messageContainer.classList.remove('hidden');
+            setTimeout(() => {
+                messageContainer.classList.add('hidden');
+            }, 3000);
+        }
+
+        function deleteImage(imageId) {
+            if (confirm('Are you sure you want to delete this image?')) {
+                fetch('delete_image.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            image_id: imageId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the image card from the UI
+                            const imageCard = document.querySelector(`[data-image-id="${imageId}"]`);
+                            if (imageCard) {
+                                imageCard.remove();
+                                showMessage('Image deleted successfully', true);
+                            }
+                        } else {
+                            showMessage('Error deleting image: ' + data.message, false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showMessage('Error deleting image', false);
+                    });
+            }
+        }
+    </script>
 </head>
 
 <body class="bg-gray-50">
     <!-- Navigation -->
     <?php
     include('includes/navigation.php');
-    ?>
-
-    <!-- Gallery Page Content -->
+    ?> <!-- Gallery Page Content -->
     <div class="container mx-auto px-4 py-8">
+        <!-- Success/Error Message Container -->
+        <div id="messageContainer" class="hidden mb-4 p-4 rounded-lg"></div>
+
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800">My Photo Gallery</h1>
             <?php
@@ -85,38 +152,29 @@ $result = $conn->query($imgsql);
                     <option>Price: High to Low</option>
                 </select>
             </div>
-        </div>
-
-        <!-- Image Grid -->
+        </div> <!-- Image Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <!-- Image Card 1 -->
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="relative overflow-hidden rounded-lg shadow-lg group image-card">
+            <?php
+            $count = 0;
+            while ($row = $result->fetch_assoc()):
+                $count++;
+                echo "<!-- Debug: Processing image #{$count}, ID: {$row['id']} -->";
+            ?><div class="relative overflow-hidden rounded-lg shadow-lg group image-card" data-image-id="<?= $row['id'] ?>">
                     <a href="image_details.php?id=<?= $row['id'] ?>">
                         <img src="<?= htmlspecialchars($row['image_url']) ?>"
                             alt="<?= htmlspecialchars($row['title']) ?>"
                             class="w-full h-64 object-cover">
                     </a>
-
-                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button onclick="deleteImage(<?= $row['id'] ?>)" class="text-white hover:text-red-400 p-4">
+                            <i class="fas fa-trash text-3xl mb-2"></i>
+                            <br>Remove Image
+                        </button>
                         <div class="text-center p-4">
                             <h3 class="text-white font-bold text-xl mb-2"><?= htmlspecialchars($row['title']) ?></h3>
-                            <p class="text-white mb-1">Lkr <?= number_format($row['price'], 2) ?></p>
-                            <p class="text-white text-sm mb-4"><?= htmlspecialchars($row['category_name']) ?></p>
-                            <div class="flex justify-center space-x-4">
-                                <a href="image_details.php?id=<?= $row['id'] ?>"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full">
-                                    <i class="fas fa-eye"></i> Details
-                                </a>
-                                <?php if (isset($_SESSION['user_id'])): ?>
-                                    <button class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full">
-                                        <i class="fas fa-heart"></i> Like
-                                    </button>
-                                    <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full">
-                                        <i class="fas fa-cart-plus"></i> Buy
-                                    </button>
-                                <?php endif; ?>
-                            </div>
+                            <p class="text-white text-sm mb-2"><?= htmlspecialchars($row['category_name']) ?></p>
+                            <p class="text-white">Lkr <?= number_format($row['price'], 2) ?></p>
                         </div>
                     </div>
                 </div>
