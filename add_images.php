@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Validate required fields
     if (empty($_POST['imageTitle']) || empty($_POST['imageCategory']) || empty($_POST['imagePrice'])) {
-        header("Location: add_images.php?error=All fields are required");
+        header("Location: gallery.php?error=All fields are required");
         exit();
     }
 
@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Validate price
     if ($price <= 0) {
-        header("Location: add_images.php?error=Price must be greater than zero");
+        header("Location: gallery.php?error=Price must be greater than zero");
         exit();
     }
 
@@ -32,42 +32,45 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $cat_check->bind_param("i", $category_id);
     $cat_check->execute();
     if (!$cat_check->get_result()->fetch_assoc()) {
-        header("Location: add_images.php?error=Invalid category");
+        $cat_check->close();
+        header("Location: gallery.php?error=Invalid category");
         exit();
     }
     $cat_check->close();
 
     // Handle file upload
-    if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['imageUpload']['tmp_name'];
-        $fileName = $_FILES['imageUpload']['name'];
-        $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
-        $newFileName = uniqid() . '.' . $fileExtension;
-        $uploadFileDir = 'uploads/';
-        $dest_path = $uploadFileDir . $newFileName;
-
-        if (move_uploaded_file($fileTmpPath, $dest_path)) {
-            $image_url = $dest_path;
-
-            // Insert into DB
-            $stmt = $conn->prepare("INSERT INTO images (user_id, category_id, title, description, image_url, price, is_public) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("iisssdi", $user_id, $category_id, $title, $description, $image_url, $price, $is_public);
-
-            if ($stmt->execute()) {
-                header("Location: user_gallery.php?msg=Image uploaded successfully");
-            } else {
-                echo "Database error: " . $stmt->error;
-            }
-
-            $stmt->close();
-        } else {
-            echo "Failed to move uploaded file.";
-        }
-    } else {
-        echo "No image file uploaded or upload error.";
+    if (!isset($_FILES['imageUpload']) || $_FILES['imageUpload']['error'] !== UPLOAD_ERR_OK) {
+        header("Location: gallery.php?error=No image file uploaded or upload error");
+        exit();
     }
 
+    $fileTmpPath = $_FILES['imageUpload']['tmp_name'];
+    $fileName = $_FILES['imageUpload']['name'];
+    $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
+    $newFileName = uniqid() . '.' . $fileExtension;
+    $uploadFileDir = 'uploads/';
+    $dest_path = $uploadFileDir . $newFileName;
+
+    if (!move_uploaded_file($fileTmpPath, $dest_path)) {
+        header("Location: gallery.php?error=Failed to upload image file");
+        exit();
+    }
+
+    $image_url = $dest_path;
+
+    // Insert into DB
+    $stmt = $conn->prepare("INSERT INTO images (user_id, category_id, title, description, image_url, price, is_public) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("iisssdi", $user_id, $category_id, $title, $description, $image_url, $price, $is_public);
+
+    if ($stmt->execute()) {
+        $stmt->close();
+        $conn->close();
+        header("Location: gallery.php?msg=Image uploaded successfully");
+        exit();
+    } 
+    
+    $stmt->close();
     $conn->close();
-    // header("Location: user_gallery.php");
+    header("Location: gallery.php?error=Database error: " . urlencode($stmt->error));
     exit();
 }
