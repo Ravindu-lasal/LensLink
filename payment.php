@@ -270,60 +270,42 @@ $user = $user_stmt->get_result()->fetch_assoc();
             <!-- Order Summary Section -->
             <div class="md:w-1/3">
                 <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Order Summary</h2>
-
-                    <!-- Items List -->
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Order Summary</h2> <!-- Items List -->
                     <div class="space-y-4 mb-6">
-                        <div class="flex justify-between items-start">
-                            <div class="flex">
-                                <div class="w-20 h-20 rounded-lg overflow-hidden mr-4">
-                                    <img src="https://source.unsplash.com/random/200x200/?nature,1" alt="Nature" class="w-full h-full object-cover">
+                        <?php foreach ($cart_items as $item): ?>
+                            <div class="flex justify-between items-start">
+                                <div class="flex">
+                                    <div class="w-20 h-20 rounded-lg overflow-hidden mr-4">
+                                        <img src="<?= htmlspecialchars($item['image_url']) ?>"
+                                            alt="<?= htmlspecialchars($item['title']) ?>"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-800"><?= htmlspecialchars($item['title']) ?></h4>
+                                        <p class="text-gray-600 text-sm">Digital Image</p>
+                                        <p class="text-gray-600 text-sm">License: Standard</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="font-medium text-gray-800">Beautiful Sunset</h4>
-                                    <p class="text-gray-600 text-sm">Large (3000x2000)</p>
-                                    <p class="text-gray-600 text-sm">License: Standard</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-medium text-gray-800">$45.00</p>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-between items-start">
-                            <div class="flex">
-                                <div class="w-20 h-20 rounded-lg overflow-hidden mr-4">
-                                    <img src="https://source.unsplash.com/random/200x200/?portrait,1" alt="Portrait" class="w-full h-full object-cover">
-                                </div>
-                                <div>
-                                    <h4 class="font-medium text-gray-800">Professional Portrait</h4>
-                                    <p class="text-gray-600 text-sm">Medium (2000x1500)</p>
-                                    <p class="text-gray-600 text-sm">License: Extended</p>
+                                <div class="text-right">
+                                    <p class="font-medium text-gray-800">Lkr <?= number_format($item['price'], 2) ?></p>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <p class="font-medium text-gray-800">$85.00</p>
-                            </div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
 
                     <!-- Order Totals -->
                     <div class="border-t border-gray-200 pt-4 mb-6">
                         <div class="flex justify-between mb-2">
                             <span class="text-gray-600">Subtotal</span>
-                            <span class="font-medium">$130.00</span>
+                            <span class="font-medium">Lkr <?= number_format($total, 2) ?></span>
                         </div>
                         <div class="flex justify-between mb-2">
-                            <span class="text-gray-600">Tax</span>
-                            <span class="font-medium">$10.40</span>
-                        </div>
-                        <div class="flex justify-between mb-2">
-                            <span class="text-gray-600">Service Fee</span>
-                            <span class="font-medium">$2.50</span>
+                            <span class="text-gray-600">License Fees</span>
+                            <span class="font-medium">Included</span>
                         </div>
                         <div class="flex justify-between font-bold text-lg mt-4 pt-2 border-t border-gray-200">
                             <span>Total</span>
-                            <span>$142.90</span>
+                            <span>Lkr <?= number_format($total, 2) ?></span>
                         </div>
                     </div>
 
