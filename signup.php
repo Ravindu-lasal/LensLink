@@ -18,11 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         die("Passwords do not match.");
     }
     // Hash password
-    $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-
-    // Insert into DB
-    $stmt = $conn->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $fullName, $email, $passwordHash, $role);
+    $passwordHash = password_hash($password, PASSWORD_DEFAULT);    // Insert into DB
+    $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $fullName, $email, $passwordHash);
 
     if ($stmt->execute()) {
         echo "<script>alert('User created successfully'); window.location.href = 'signin.php';</script>";

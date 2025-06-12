@@ -1,14 +1,41 @@
 <?php
 session_start();
 require_once 'config/db_conn.php';
+require_once 'config/auth_check.php';
+
+// Check if user is logged in
+checkUserAuth();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $user_id = $_SESSION['user_id']; // Must be logged in
-    $title = $_POST['imageTitle'];
-    $description = $_POST['imageDescription'];
-    $category_id = $_POST['imageCategory'];
-    $price = $_POST['imagePrice'];
-    $is_public = 1; // or use checkbox to toggle
+    $user_id = $_SESSION['user_id'];
+
+    // Validate required fields
+    if (empty($_POST['imageTitle']) || empty($_POST['imageCategory']) || empty($_POST['imagePrice'])) {
+        header("Location: add_images.php?error=All fields are required");
+        exit();
+    }
+
+    $title = trim($_POST['imageTitle']);
+    $description = trim($_POST['imageDescription']);
+    $category_id = (int)$_POST['imageCategory'];
+    $price = floatval($_POST['imagePrice']);
+    $is_public = isset($_POST['isPublic']) ? 1 : 0;
+
+    // Validate price
+    if ($price <= 0) {
+        header("Location: add_images.php?error=Price must be greater than zero");
+        exit();
+    }
+
+    // Validate category exists
+    $cat_check = $conn->prepare("SELECT id FROM categories WHERE id = ?");
+    $cat_check->bind_param("i", $category_id);
+    $cat_check->execute();
+    if (!$cat_check->get_result()->fetch_assoc()) {
+        header("Location: add_images.php?error=Invalid category");
+        exit();
+    }
+    $cat_check->close();
 
     // Handle file upload
     if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] === UPLOAD_ERR_OK) {
@@ -44,4 +71,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // header("Location: user_gallery.php");
     exit();
 }
-?>

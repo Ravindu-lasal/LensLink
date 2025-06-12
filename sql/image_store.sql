@@ -27,6 +27,30 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `categories`
+--
+
+CREATE TABLE IF NOT EXISTS `categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Insert some default categories
+INSERT INTO `categories` (`name`, `description`) VALUES
+('Nature', 'Beautiful natural landscapes and wildlife'),
+('Portrait', 'Professional portrait photography'),
+('Architecture', 'Buildings and architectural photography'),
+('Events', 'Special events and occasions'),
+('Abstract', 'Abstract and artistic photography'),
+('Street', 'Urban and street photography');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `images`
 --
 
@@ -37,11 +61,12 @@ CREATE TABLE IF NOT EXISTS `images` (
   `description` text DEFAULT NULL,
   `image_url` varchar(255) NOT NULL,
   `price` decimal(10,2) NOT NULL,
-  `category` varchar(50) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
   `is_public` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
