@@ -24,6 +24,7 @@ $result = $conn->query($imgsql);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,16 +36,18 @@ $result = $conn->query($imgsql);
         .image-card:hover .image-overlay {
             opacity: 1;
         }
+
         .modal {
             transition: opacity 0.3s ease-in-out;
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Navigation -->
-     <?php
-       include('includes/navigation.php');
-     ?>
+    <?php
+    include('includes/navigation.php');
+    ?>
 
     <!-- Gallery Page Content -->
     <div class="container mx-auto px-4 py-8">
@@ -58,7 +61,7 @@ $result = $conn->query($imgsql);
             }
             ?>
         </div>
-        
+
         <!-- Search and Filter -->
         <div class="flex flex-col md:flex-row justify-between mb-8">
             <div class="relative mb-4 md:mb-0">
@@ -83,14 +86,14 @@ $result = $conn->query($imgsql);
                 </select>
             </div>
         </div>
-        
+
         <!-- Image Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <!-- Image Card 1 -->
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div class="relative overflow-hidden rounded-lg shadow-lg group image-card">
-                    <img src="<?= htmlspecialchars($row['image_url']) ?>" 
-                        alt="<?= htmlspecialchars($row['title']) ?>" 
+                    <img src="<?= htmlspecialchars($row['image_url']) ?>"
+                        alt="<?= htmlspecialchars($row['title']) ?>"
                         class="w-full h-64 object-cover">
 
                     <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -99,8 +102,8 @@ $result = $conn->query($imgsql);
                             <p class="text-white mb-1">Lkr <?= number_format($row['price'], 2) ?></p>
                             <p class="text-white text-sm mb-4"><?= htmlspecialchars($row['category_name']) ?></p>
                             <div class="flex justify-center space-x-4">
-                                <button onclick="openImageModal('<?= htmlspecialchars($row['image_url']) ?>')" 
-                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full">
+                                <button onclick="openImageModal('<?= htmlspecialchars($row['image_url']) ?>')"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full">
                                     <i class="fas fa-eye"></i> View
                                 </button>
                                 <button class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full">
@@ -114,9 +117,9 @@ $result = $conn->query($imgsql);
                     </div>
                 </div>
             <?php endwhile; ?>
-            
+
         </div>
-        
+
         <!-- Pagination -->
         <div class="flex justify-center mt-10">
             <nav class="inline-flex rounded-md shadow">
@@ -139,9 +142,9 @@ $result = $conn->query($imgsql);
         </div>
     </div>
 
-   <?php
-   include 'includes/footer.php'
-   ?>
+    <?php
+    include 'includes/footer.php'
+    ?>
 
     <!-- Image Preview Modal -->
     <div id="imageModal" class="fixed inset-0 z-50 hidden modal">
@@ -195,13 +198,11 @@ $result = $conn->query($imgsql);
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Upload Image Modal -->
-    <div id="uploadModal" class="fixed inset-0 z-50 hidden modal">
+    </div> <!-- Upload Image Modal -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden modal overflow-y-auto">
         <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeUploadModal()"></div>
         <div class="relative max-w-2xl mx-auto my-8 p-4">
-            <div class="bg-white rounded-lg p-6">
+            <div class="bg-white rounded-lg p-6 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Upload New Image</h2>
                     <button onclick="closeUploadModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
@@ -221,7 +222,7 @@ $result = $conn->query($imgsql);
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2" for="imageCategory">Category</label>
                         <select id="imageCategory" name="imageCategory" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
-                             <option value="">-- Select Category --</option>
+                            <option value="">-- Select Category --</option>
                             <?php foreach ($categories as $category): ?>
                                 <option value="<?= htmlspecialchars($category['id']) ?>">
                                     <?= htmlspecialchars($category['name']) ?>
@@ -267,7 +268,7 @@ $result = $conn->query($imgsql);
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
-        
+
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
@@ -320,4 +321,5 @@ $result = $conn->query($imgsql);
         });
     </script>
 </body>
+
 </html>
