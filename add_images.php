@@ -67,8 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $conn->close();
         header("Location: gallery.php?msg=Image uploaded successfully");
         exit();
-    } 
-    
+    }
+
     $stmt->close();
     $conn->close();
     header("Location: gallery.php?error=Database error: " . urlencode($stmt->error));
