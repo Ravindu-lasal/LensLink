@@ -23,7 +23,6 @@ $cart_count = isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0;
                     <a href="gallery.php" class="py-4 px-2 <?php echo $current_page == 'gallery.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Gallery</a>
                     <?php if (isset($_SESSION['user_id'])) { ?>
                         <a href="favorites.php" class="py-4 px-2 <?php echo $current_page == 'favorites.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Favorites</a>
-                        <a href="payment.php" class="py-4 px-2 <?php echo $current_page == 'payment.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Cart</a>
                     <?php } ?>
                 </div>
             </div>
