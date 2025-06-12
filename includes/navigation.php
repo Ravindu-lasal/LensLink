@@ -31,8 +31,7 @@ $cart_count = isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0;
             if (isset($_SESSION['user_id'])) {
                 // User is logged in
                 echo '<div class="hidden md:flex items-center space-x-3">
-                             <a href="user_gallery.php" class="py-2 px-2 font-medium ' . ($current_page == 'user_gallery.php' ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300') . '">My gallery</a>
-                             <a href="payment.php" class="py-2 px-2 font-medium relative">
+                             <a href="user_gallery.php" class="py-2 px-2 font-medium ' . ($current_page == 'user_gallery.php' ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300') . '">My gallery</a>                             <a href="cart.php" class="py-2 px-2 font-medium relative">
                                 <i class="fas fa-shopping-cart text-xl text-gray-700 hover:text-blue-600 transition duration-300"></i>
                                 <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">' . $cart_count . '</span>
                              </a>
