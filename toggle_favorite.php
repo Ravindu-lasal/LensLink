@@ -1,6 +1,7 @@
 <?php
 require_once 'config/db_conn.php';
 require_once 'config/auth_check.php';
+session_start();
 
 if (!isset($_POST['image_id'])) {
     header('Location: gallery.php');

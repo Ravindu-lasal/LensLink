@@ -1,6 +1,7 @@
 <?php
 require_once 'config/db_conn.php';
 require_once 'config/auth_check.php';
+session_start();
 
 // Fetch favorite images
 $sql = "SELECT i.*, u.name as photographer_name, c.name as category_name 
