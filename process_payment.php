@@ -77,12 +77,13 @@ try {
 
     if (empty($cart_items)) {
         throw new Exception('Cart is empty');
-    }
+    }    // Get the last 4 digits of the card
+    $card_last4 = substr($card_number, -4);
 
     // Create order record
-    $order_sql = "INSERT INTO orders (user_id, total_amount, status) VALUES (?, ?, 'completed')";
+    $order_sql = "INSERT INTO orders (user_id, total_amount, status, payment_method, card_last4) VALUES (?, ?, 'completed', 'credit_card', ?)";
     $order_stmt = $conn->prepare($order_sql);
-    $order_stmt->bind_param("id", $user_id, $total);
+    $order_stmt->bind_param("ids", $user_id, $total, $card_last4);
     $order_stmt->execute();
     $order_id = $conn->insert_id;
 
@@ -93,17 +94,12 @@ try {
     foreach ($cart_items as $item) {
         $order_items_stmt->bind_param("iid", $order_id, $item['image_id'], $item['price']);
         $order_items_stmt->execute();
-    }
-
-    // Mark images as purchased
-    $payment_sql = "INSERT INTO payments (user_id, image_id, amount, payment_status, payment_date, is_purchased) 
-                    VALUES (?, ?, ?, 'completed', NOW(), 1)";
+    }    // Create payment record
+    $payment_sql = "INSERT INTO payments (order_id, amount, payment_method, status) 
+                    VALUES (?, ?, 'credit_card', 'completed')";
     $payment_stmt = $conn->prepare($payment_sql);
-
-    foreach ($cart_items as $item) {
-        $payment_stmt->bind_param("iid", $user_id, $item['image_id'], $item['price']);
-        $payment_stmt->execute();
-    }
+    $payment_stmt->bind_param("id", $order_id, $total);
+    $payment_stmt->execute();
 
     // Clear cart
     $clear_cart_sql = "DELETE FROM cart_items WHERE user_id = ?";
