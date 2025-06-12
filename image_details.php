@@ -31,6 +31,7 @@ $image = $result->fetch_assoc();
 
 // Check if the current user has purchased this image
 $has_purchased = false;
+$is_favorited = false;
 if (isset($_SESSION['user_id'])) {
     $purchase_check_sql = "SELECT 1 FROM images i 
                           INNER JOIN order_items oi ON i.id = oi.image_id
@@ -42,6 +43,13 @@ if (isset($_SESSION['user_id'])) {
     $check_stmt->bind_param("ii", $_SESSION['user_id'], $image_id);
     $check_stmt->execute();
     $has_purchased = $check_stmt->get_result()->num_rows > 0;
+
+    // Check if image is favorited
+    $fav_check_sql = "SELECT 1 FROM favorites WHERE user_id = ? AND image_id = ?";
+    $fav_stmt = $conn->prepare($fav_check_sql);
+    $fav_stmt->bind_param("ii", $_SESSION['user_id'], $image_id);
+    $fav_stmt->execute();
+    $is_favorited = $fav_stmt->get_result()->num_rows > 0;
 }
 
 // Fetch related images from the same category
@@ -98,6 +106,15 @@ $related_images = $stmt->get_result();
                         <p class="text-3xl font-bold text-blue-600">Lkr <?= number_format($image['price'], 2) ?></p>
                         <p class="text-sm text-gray-500">Includes commercial license</p>
                     </div>
+
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <button id="favButton"
+                            class="mb-4 flex items-center justify-center w-full px-4 py-2 text-sm font-medium rounded-md <?= $is_favorited ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700' ?> hover:bg-opacity-90 transition-colors">
+                            <i class="fas <?= $is_favorited ? 'fa-heart' : 'fa-heart' ?> mr-2"></i>
+                            <span id="favText"><?= $is_favorited ? 'Remove from Favorites' : 'Add to Favorites' ?></span>
+                        </button>
+                    <?php endif; ?>
+
                     <div class="space-y-4">
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <?php if ($has_purchased): ?>
@@ -201,6 +218,38 @@ $related_images = $stmt->get_result();
                     messageDiv.textContent = 'Error adding item to cart';
                 });
         }
+
+        // Favorite button functionality
+        document.getElementById('favButton')?.addEventListener('click', async function() {
+            try {
+                const response = await fetch('toggle_favorite.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `image_id=<?= $image_id ?>`
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const btn = document.getElementById('favButton');
+                    const text = document.getElementById('favText');
+
+                    if (data.isFavorited) {
+                        btn.classList.remove('bg-gray-100', 'text-gray-700');
+                        btn.classList.add('bg-red-100', 'text-red-700');
+                        text.textContent = 'Remove from Favorites';
+                    } else {
+                        btn.classList.remove('bg-red-100', 'text-red-700');
+                        btn.classList.add('bg-gray-100', 'text-gray-700');
+                        text.textContent = 'Add to Favorites';
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
     </script>
 </body>
 
