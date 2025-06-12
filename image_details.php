@@ -29,6 +29,21 @@ if ($result->num_rows === 0) {
 
 $image = $result->fetch_assoc();
 
+// Check if the current user has purchased this image
+$has_purchased = false;
+if (isset($_SESSION['user_id'])) {
+    $purchase_check_sql = "SELECT 1 FROM images i 
+                          INNER JOIN order_items oi ON i.id = oi.image_id
+                          INNER JOIN orders o ON oi.order_id = o.id
+                          INNER JOIN payments p ON o.id = p.order_id
+                          WHERE o.user_id = ? AND i.id = ? AND p.payment_status = 'completed'
+                          LIMIT 1";
+    $check_stmt = $conn->prepare($purchase_check_sql);
+    $check_stmt->bind_param("ii", $_SESSION['user_id'], $image_id);
+    $check_stmt->execute();
+    $has_purchased = $check_stmt->get_result()->num_rows > 0;
+}
+
 // Fetch related images from the same category
 $related_sql = "SELECT * FROM images WHERE category_id = ? AND id != ? LIMIT 4";
 $stmt = $conn->prepare($related_sql);
@@ -85,13 +100,16 @@ $related_images = $stmt->get_result();
                     </div>
                     <div class="space-y-4">
                         <?php if (isset($_SESSION['user_id'])): ?>
-                            <button onclick="addToCart(<?= $image['id'] ?>)"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                            </button>
-                            <button class="w-full bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-heart mr-2"></i> Add to Favorites
-                            </button>
+                            <?php if ($has_purchased): ?>
+                                <a href="download_image.php?id=<?= $image['id'] ?>"
+                                    class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-download mr-2"></i> Download Image
+                                </a> <?php else: ?>
+                                <button onclick="addToCart(<?= $image['id'] ?>)"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
+                                </button>
+                            <?php endif; ?>
                             <div id="addToCartMessage" class="hidden text-center p-2 rounded-lg"></div>
                         <?php else: ?>
                             <a href="signin.php?redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>"
