@@ -69,7 +69,9 @@ $cart_count = isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : 0;
     <div class="hidden mobile-menu">
         <ul class="">
             <li class="active"><a href="index.php" class="block text-sm px-2 py-4 text-white bg-blue-600 font-semibold">Home</a></li>
-            <li><a href="gallery.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Gallery</a></li> <?php if (isset($_SESSION['user_id'])) { ?>
+            <li><a href="gallery.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Gallery</a></li>
+            <?php if (isset($_SESSION['user_id'])) { ?>
+                <li><a href="uploads.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Uploads</a></li>
                 <li><a href="favorites.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Favorites</a></li>
                 <li><a href="profile.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Profile</a></li>
                 <li><a href="payment.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Payments</a></li>
