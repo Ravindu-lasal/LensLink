@@ -1,8 +1,26 @@
 <?php
 session_start();
+
+include_once 'config/db_conn.php';
+
+$allImages = [];
+
+$imageSql = "SELECT * FROM images WHERE is_public = 1 ORDER BY created_at DESC";
+$imageResult = $conn->query($imageSql);
+if ($imageResult && $imageResult->num_rows > 0) {
+    while ($row = $imageResult->fetch_assoc()) {
+        $allImages[] = $row;
+    }
+} else {
+    // Handle case where no images are found
+    $allImages = [];
+}
+
+var_dump($allImages); // For debugging purposes, remove in production
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,36 +32,52 @@ session_start();
         .image-card:hover .image-overlay {
             opacity: 1;
         }
+
         .modal {
             transition: opacity 0.3s ease-in-out;
         }
-        
+
         /* Slider styles */
         .slider-container {
             position: relative;
         }
+
         .slider-track {
             display: flex;
             width: 300%;
             animation: slide 15s infinite linear;
         }
+
         @keyframes slide {
-            0% { transform: translateX(0); }
-            33% { transform: translateX(-33.33%); }
-            66% { transform: translateX(-66.66%); }
-            100% { transform: translateX(0); }
+            0% {
+                transform: translateX(0);
+            }
+
+            33% {
+                transform: translateX(-33.33%);
+            }
+
+            66% {
+                transform: translateX(-66.66%);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
         }
+
         .slider-slide {
             flex-shrink: 0;
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Navigation -->
-     <?php
-       include('includes/navigation.php');
-     ?>
-  
+    <?php
+    include('includes/navigation.php');
+    ?>
+
 
     <!-- Homepage Hero Slider -->
     <div class="relative">
@@ -80,63 +114,16 @@ session_start();
             <p class="text-gray-600 max-w-2xl mx-auto">Explore some of our most popular images from talented photographers worldwide</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            <!-- Featured Image 1 -->
-            <div class="max-w-sm mx-auto">
-                <div class="relative overflow-hidden rounded-lg shadow-lg group image-card">
-                    <img src="./images/Home/robert-lukeman-PH0HYjsf2n8-unsplash.jpg" alt="Nature" class="w-full h-64 object-cover">
-                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 image-overlay transition-opacity duration-300">
-                        <div class="text-center p-4">
-                            <h3 class="text-white font-bold text-xl mb-2">Beautiful Waterfall</h3>
-                            <p class="text-white mb-4">$45.00</p>
-                            <button onclick="openImageModal('./images/Home/robert-lukeman-PH0HYjsf2n8-unsplash.jpg')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                                View Details
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Featured Image 2 -->
-            <div class="relative overflow-hidden rounded-lg shadow-lg group image-card">
-                <img src="./Images/Home/pixasquare-4ojhpgKpS68-unsplash.jpg" alt="Portrait" class="w-full h-64 object-cover">
-                <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 image-overlay transition-opacity duration-300">
-                    <div class="text-center p-4">
-                        <h3 class="text-white font-bold text-xl mb-2">Modern Building</h3>
-                        <p class="text-white mb-4">$65.00</p>
-                        <button onclick="openImageModal('./Images/Home/pixasquare-4ojhpgKpS68-unsplash.jpg')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                            View Details
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <!-- Featured Image 3 -->
-            <div class="relative overflow-hidden rounded-lg shadow-lg group image-card">
-                <img src="./Images/Home/jessica-felicio-_cvwXhGqG-o-unsplash.jpg" alt="Travel" class="w-full h-64 object-cover">
-                <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 image-overlay transition-opacity duration-300">
-                    <div class="text-center p-4">
-                        <h3 class="text-white font-bold text-xl mb-2">Professional Portrait</h3>
-                        <p class="text-white mb-4">$55.00</p>
-                        <button onclick="openImageModal('./Images/Home/jessica-felicio-_cvwXhGqG-o-unsplash.jpg')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                            View Details
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <!-- Featured Image 4 -->
-            <div class="relative overflow-hidden rounded-lg shadow-lg group image-card">
-                <img src="./Images/Home/element5-digital-uE2T1tCFsn8-unsplash.jpg" alt="Architecture" class="w-full h-64 object-cover">
-                <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 image-overlay transition-opacity duration-300">
-                    <div class="text-center p-4">
-                        <h3 class="text-white font-bold text-xl mb-2">Travel Map</h3>
-                        <p class="text-white mb-4">$75.00</p>
-                        <button onclick="openImageModal('./Images/Home/element5-digital-uE2T1tCFsn8-unsplash.jpg')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                            View Details
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="text-center mt-8">
-            <a href="gallery.html" class="inline-block border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-3 rounded-lg text-lg font-medium transition duration-300">View All Photos</a>
+            <?php
+            foreach ($allImages as $image) {
+                // Include the image card component
+                $imageTitle = htmlspecialchars($image['title']);
+                $imageDescription = htmlspecialchars($image['description']);
+                $imageSrc = htmlspecialchars($image['image_url']);
+
+                include 'includes/imageCard.php';
+            }
+            ?>
         </div>
     </div>
 
@@ -211,12 +198,12 @@ session_start();
         </div>
     </div>
 
-        
+
     </div>
 
     <!-- Footer -->
-     <?php
-     include 'includes/footer.php';
+    <?php
+    include 'includes/footer.php';
     ?>
 
     <!-- Image Preview Modal -->
@@ -347,7 +334,7 @@ session_start();
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
-        
+
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
@@ -386,34 +373,34 @@ session_start();
         const prevBtn = document.querySelector('.slider-prev');
         const nextBtn = document.querySelector('.slider-next');
         let currentIndex = 0;
-        
+
         function goToSlide(index) {
             sliderTrack.style.transform = `translateX(-${index * 100}%)`;
             currentIndex = index;
         }
-        
+
         function nextSlide() {
             currentIndex = (currentIndex + 1) % slides.length;
             goToSlide(currentIndex);
         }
-        
+
         function prevSlide() {
             currentIndex = (currentIndex - 1 + slides.length) % slides.length;
             goToSlide(currentIndex);
         }
-        
+
         nextBtn.addEventListener('click', nextSlide);
         prevBtn.addEventListener('click', prevSlide);
-        
+
         // Auto-play slider
         let sliderInterval = setInterval(nextSlide, 5000);
-        
+
         // Pause on hover
         const sliderContainer = document.querySelector('.slider-container');
         sliderContainer.addEventListener('mouseenter', () => {
             clearInterval(sliderInterval);
         });
-        
+
         sliderContainer.addEventListener('mouseleave', () => {
             sliderInterval = setInterval(nextSlide, 5000);
         });
@@ -438,4 +425,5 @@ session_start();
         });
     </script>
 </body>
+
 </html>
