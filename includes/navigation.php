@@ -18,8 +18,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <div class="hidden md:flex items-center space-x-1">
                     <a href="index.php" class="py-4 px-2 <?php echo $current_page == 'index.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Home</a>
                     <a href="gallery.php" class="py-4 px-2 <?php echo $current_page == 'gallery.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Gallery</a>
-                    <a href="favorites.php" class="py-4 px-2 <?php echo $current_page == 'favorites.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Favorites</a>
-                    <a href="payment.php" class="py-4 px-2 <?php echo $current_page == 'payment.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Cart</a>
+                    <?php if (isset($_SESSION['user_id'])) { ?>
+                        <a href="favorites.php" class="py-4 px-2 <?php echo $current_page == 'favorites.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Favorites</a>
+                        <a href="payment.php" class="py-4 px-2 <?php echo $current_page == 'payment.php' ? 'text-blue-600 border-b-4 border-blue-600' : 'text-gray-700 hover:text-blue-600 transition duration-300'; ?>">Cart</a>
+                    <?php } ?>
                 </div>
             </div>
             <!-- Secondary Navbar items -->
@@ -60,8 +62,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <ul class="">
             <li class="active"><a href="index.php" class="block text-sm px-2 py-4 text-white bg-blue-600 font-semibold">Home</a></li>
             <li><a href="gallery.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Gallery</a></li>
-            <li><a href="favorites.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Favorites</a></li>
-            <li><a href="payment.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Payments</a></li>
+            <?php if (isset($_SESSION['user_id'])) { ?>
+                <li><a href="favorites.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Favorites</a></li>
+                <li><a href="payment.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Payments</a></li>
+            <?php } ?>
             <li><a href="signin.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign In</a></li>
             <li><a href="signup.php" class="block text-sm px-2 py-4 hover:bg-blue-600 hover:text-white transition duration-300">Sign Up</a></li>
         </ul>

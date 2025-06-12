@@ -2,6 +2,10 @@
 session_start();
 require_once 'config/db_conn.php';
 
+// Store redirect URL if provided
+$redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '';
+$_SESSION['redirect_after_login'] = $redirect;
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $email = trim($_POST["email"]);
@@ -30,7 +34,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['user_email'] = $user['email'];
 
-            // Redirect to dashboard or homepage
+            // Redirect to stored URL or homepage
+            if (!empty($_SESSION['redirect_after_login'])) {
+                $redirect_url = $_SESSION['redirect_after_login'];
+                unset($_SESSION['redirect_after_login']); // Clear the stored URL
+                header("Location: " . $redirect_url);
+                exit();
+            }
+
             header("Location: index.php");
             exit();
         } else {

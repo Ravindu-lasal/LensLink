@@ -1,5 +1,10 @@
+<?php
+require_once 'config/auth_check.php';
+checkUserAuth();
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,20 +13,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Custom styles */
-        .card-input:focus + .card-icon {
+        .card-input:focus+.card-icon {
             color: #3b82f6;
         }
-        .payment-method:checked + .payment-label {
+
+        .payment-method:checked+.payment-label {
             border-color: #3b82f6;
             background-color: #f0f7ff;
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Navigation -->
     <?php
-       include('includes/navigation.php');
-     ?>
+    include('includes/navigation.php');
+    ?>
 
     <!-- Payment Page Content -->
     <div class="container mx-auto px-4 py-8">
@@ -30,7 +37,7 @@
             <div class="md:w-2/3">
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Payment Details</h2>
-                    
+
                     <!-- Payment Method Selection -->
                     <div class="mb-8">
                         <h3 class="text-lg font-semibold text-gray-700 mb-4">Payment Method</h3>
@@ -61,7 +68,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Credit Card Form (shown by default) -->
                     <div id="credit-card-form">
                         <div class="mb-6">
@@ -73,7 +80,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <label for="card-expiry" class="block text-gray-700 font-medium mb-2">Expiry Date</label>
@@ -89,13 +96,13 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="mb-6">
                             <label for="card-name" class="block text-gray-700 font-medium mb-2">Name on Card</label>
                             <input type="text" id="card-name" placeholder="John Smith" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
                         </div>
                     </div>
-                    
+
                     <!-- PayPal Form (hidden by default) -->
                     <div id="paypal-form" class="hidden">
                         <div class="bg-gray-100 p-6 rounded-lg text-center">
@@ -105,7 +112,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- Bank Transfer Form (hidden by default) -->
                     <div id="bank-transfer-form" class="hidden">
                         <div class="bg-gray-100 p-6 rounded-lg">
@@ -135,18 +142,18 @@
                             <p class="text-gray-700 mt-4 text-sm">Please include your order number as the payment reference.</p>
                         </div>
                     </div>
-                    
+
                     <!-- Billing Address -->
                     <div class="mt-8 pt-6 border-t border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-700 mb-4">Billing Address</h3>
-                        
+
                         <div class="mb-4">
                             <label class="inline-flex items-center">
                                 <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600" checked>
                                 <span class="ml-2 text-gray-700">Same as shipping address</span>
                             </label>
                         </div>
-                        
+
                         <div id="billing-address-fields" class="hidden">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
@@ -158,13 +165,13 @@
                                     <input type="text" id="billing-last-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
                                 </div>
                             </div>
-                            
+
                             <div class="mb-6">
                                 <label for="billing-address" class="block text-gray-700 font-medium mb-2">Address</label>
                                 <input type="text" id="billing-address" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent mb-2">
                                 <input type="text" id="billing-address2" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
                             </div>
-                            
+
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                 <div>
                                     <label for="billing-city" class="block text-gray-700 font-medium mb-2">City</label>
@@ -179,7 +186,7 @@
                                     <input type="text" id="billing-zip" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
                                 </div>
                             </div>
-                            
+
                             <div class="mb-6">
                                 <label for="billing-country" class="block text-gray-700 font-medium mb-2">Country</label>
                                 <select id="billing-country" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
@@ -194,7 +201,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Proceed to Payment Button -->
                     <div class="mt-8">
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition duration-200">
@@ -202,7 +209,7 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <!-- Security Info -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-start">
@@ -223,12 +230,12 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Order Summary Section -->
             <div class="md:w-1/3">
                 <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Order Summary</h2>
-                    
+
                     <!-- Items List -->
                     <div class="space-y-4 mb-6">
                         <div class="flex justify-between items-start">
@@ -246,7 +253,7 @@
                                 <p class="font-medium text-gray-800">$45.00</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex justify-between items-start">
                             <div class="flex">
                                 <div class="w-20 h-20 rounded-lg overflow-hidden mr-4">
@@ -263,7 +270,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Order Totals -->
                     <div class="border-t border-gray-200 pt-4 mb-6">
                         <div class="flex justify-between mb-2">
@@ -283,7 +290,7 @@
                             <span>$142.90</span>
                         </div>
                     </div>
-                    
+
                     <!-- Promo Code -->
                     <div class="mb-6">
                         <label for="promo-code" class="block text-gray-700 font-medium mb-2">Promo Code</label>
@@ -292,7 +299,7 @@
                             <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-r-lg transition duration-200">Apply</button>
                         </div>
                     </div>
-                    
+
                     <!-- Help Link -->
                     <div class="text-center">
                         <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Need help? Contact our support</a>
@@ -304,14 +311,14 @@
 
     <!-- Footer -->
     <?php
-     include 'includes/footer.php';
+    include 'includes/footer.php';
     ?>
 
     <script>
         // Mobile menu toggle
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
-        
+
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
@@ -321,14 +328,14 @@
         const creditCardForm = document.getElementById('credit-card-form');
         const paypalForm = document.getElementById('paypal-form');
         const bankTransferForm = document.getElementById('bank-transfer-form');
-        
+
         paymentMethods.forEach(method => {
             method.addEventListener('change', function() {
                 // Hide all forms first
                 creditCardForm.classList.add('hidden');
                 paypalForm.classList.add('hidden');
                 bankTransferForm.classList.add('hidden');
-                
+
                 // Show the selected form
                 if (this.value === 'credit-card') {
                     creditCardForm.classList.remove('hidden');
@@ -343,7 +350,7 @@
         // Billing address toggle
         const sameAsShippingCheckbox = document.querySelector('input[type="checkbox"]');
         const billingAddressFields = document.getElementById('billing-address-fields');
-        
+
         sameAsShippingCheckbox.addEventListener('change', function() {
             if (this.checked) {
                 billingAddressFields.classList.add('hidden');
@@ -357,10 +364,10 @@
         cardNumberInput.addEventListener('input', function(e) {
             // Remove all non-digit characters
             let value = this.value.replace(/\D/g, '');
-            
+
             // Add space after every 4 digits
             value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-            
+
             // Update the input value
             this.value = value;
         });
@@ -370,15 +377,16 @@
         expiryInput.addEventListener('input', function(e) {
             // Remove all non-digit characters
             let value = this.value.replace(/\D/g, '');
-            
+
             // Add slash after 2 digits (MM/YY format)
             if (value.length > 2) {
                 value = value.substring(0, 2) + '/' + value.substring(2, 4);
             }
-            
+
             // Update the input value
             this.value = value;
         });
     </script>
 </body>
+
 </html>
