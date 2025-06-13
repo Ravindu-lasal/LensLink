@@ -1,5 +1,4 @@
-
-<?php 
+<?php
 session_start();
 require_once '../config/db_conn.php';
 ?>
@@ -44,6 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,12 +61,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             --warning-color: #fdcb6e;
             --danger-color: #d63031;
         }
-        
+
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .sidebar {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -75,28 +75,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             padding-top: 20px;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .sidebar .nav-link {
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 5px;
             border-radius: 5px;
             padding: 10px 15px;
         }
-        
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
             background-color: rgba(255, 255, 255, 0.2);
             color: white;
         }
-        
+
         .sidebar .nav-link i {
             margin-right: 10px;
         }
-        
+
         .main-content {
             margin-left: 250px;
             padding: 20px;
         }
-        
+
         .card {
             border: none;
             border-radius: 10px;
@@ -104,64 +105,64 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             transition: transform 0.3s;
             margin-bottom: 20px;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
         }
-        
+
         .user-profile {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
         }
-        
+
         .table-responsive {
             border-radius: 10px;
             overflow: hidden;
         }
-        
+
         .table thead {
             background-color: var(--primary-color);
             color: white;
         }
-        
+
         .badge-photographer {
             background-color: #fd79a8;
             color: white;
         }
-        
+
         .badge-buyer {
             background-color: #74b9ff;
             color: white;
         }
-        
+
         .badge-admin {
             background-color: #00b894;
             color: white;
         }
-        
+
         .search-box {
             position: relative;
             max-width: 300px;
         }
-        
+
         .search-box .form-control {
             padding-left: 40px;
         }
-        
+
         .search-box i {
             position: absolute;
             left: 15px;
             top: 12px;
             color: #6c757d;
         }
-        
+
         .filter-dropdown .dropdown-menu {
             padding: 15px;
             min-width: 250px;
         }
-        
+
         .user-details-card .profile-img {
             width: 120px;
             height: 120px;
@@ -171,29 +172,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             border: 5px solid white;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+
         .user-stats {
             display: flex;
             justify-content: space-around;
             text-align: center;
             margin-top: 20px;
         }
-        
+
         .user-stat {
             padding: 10px;
         }
-        
+
         .user-stat-value {
             font-size: 1.5rem;
             font-weight: bold;
         }
-        
+
         .user-stat-label {
             font-size: 0.8rem;
             color: #6c757d;
         }
     </style>
 </head>
+
 <body>
     <div class="d-flex">
         <!-- Sidebar -->
@@ -205,16 +207,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="main-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Users Management</h2>
-                <div class="d-flex">
-                    <div class="search-box me-3">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="form-control" placeholder="Search users...">
-                    </div>
-                    
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                        <i class="fas fa-plus me-2"></i>Add User
-                    </button>
-                </div>
             </div>
 
             <!-- User Details Card (Visible when a user is selected) -->
@@ -329,7 +321,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 $result = $conn->query($query);
 
                                 if ($result->num_rows > 0) {
-                                    while($row = $result->fetch_assoc()) {
+                                    while ($row = $result->fetch_assoc()) {
                                 ?>
                                         <tr class="user-row" data-user-id="<?php echo $row['id']; ?>">
                                             <td>
@@ -358,7 +350,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                 </button>
                                             </td>
                                         </tr>
-                                        <?php
+                                <?php
                                     }
                                 } else {
                                     echo '<tr><td colspan="7" class="text-center">No users found</td></tr>';
@@ -367,7 +359,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </tbody>
                         </table>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -435,18 +427,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 button.addEventListener('click', function() {
                     const userRow = this.closest('.user-row');
                     const userId = userRow.getAttribute('data-user-id');
-                    
+
                     // In a real application, you would fetch user details from an API
                     // Here we're just showing the card with the existing data
                     document.getElementById('userDetailsCard').classList.remove('d-none');
-                    
+
                     // Scroll to the details card
                     document.getElementById('userDetailsCard').scrollIntoView({
                         behavior: 'smooth'
                     });
                 });
             });
-            
+
             // Close user details (in a real app, you'd have a close button)
             // For now, we'll just hide it when clicking anywhere outside
             document.addEventListener('click', function(e) {
@@ -457,4 +449,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         });
     </script>
 </body>
+
 </html>

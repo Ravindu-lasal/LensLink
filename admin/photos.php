@@ -1,9 +1,10 @@
-<?php 
+<?php
 session_start();
 require_once '../config/db_conn.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,12 +22,12 @@ require_once '../config/db_conn.php';
             --warning-color: #fdcb6e;
             --danger-color: #d63031;
         }
-        
+
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .sidebar {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -35,28 +36,29 @@ require_once '../config/db_conn.php';
             padding-top: 20px;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .sidebar .nav-link {
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 5px;
             border-radius: 5px;
             padding: 10px 15px;
         }
-        
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
             background-color: rgba(255, 255, 255, 0.2);
             color: white;
         }
-        
+
         .sidebar .nav-link i {
             margin-right: 10px;
         }
-        
+
         .main-content {
             margin-left: 250px;
             padding: 20px;
         }
-        
+
         .card {
             border: none;
             border-radius: 10px;
@@ -64,18 +66,18 @@ require_once '../config/db_conn.php';
             transition: transform 0.3s;
             margin-bottom: 20px;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
         }
-        
+
         .photo-thumbnail {
             width: 100%;
             height: 180px;
             object-fit: cover;
             border-radius: 8px 8px 0 0;
         }
-        
+
         .photo-description {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -83,57 +85,57 @@ require_once '../config/db_conn.php';
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         .user-profile {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
         }
-        
+
         .search-box {
             position: relative;
             max-width: 300px;
         }
-        
+
         .search-box .form-control {
             padding-left: 40px;
         }
-        
+
         .search-box i {
             position: absolute;
             left: 15px;
             top: 12px;
             color: #6c757d;
         }
-        
+
         .filter-dropdown .dropdown-menu {
             padding: 15px;
             min-width: 250px;
         }
-        
+
         .photo-details-container {
             display: flex;
             flex-wrap: wrap;
         }
-        
+
         .photo-preview {
             flex: 0 0 60%;
             max-width: 60%;
             padding-right: 20px;
         }
-        
+
         .photo-info {
             flex: 0 0 40%;
             max-width: 40%;
         }
-        
+
         .photo-preview img {
             width: 100%;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .tag {
             display: inline-block;
             background-color: #e0e0e0;
@@ -143,18 +145,18 @@ require_once '../config/db_conn.php';
             margin-right: 5px;
             margin-bottom: 5px;
         }
-        
+
         @media (max-width: 992px) {
             .photo-details-container {
                 flex-direction: column;
             }
-            
+
             .photo-preview,
             .photo-info {
                 flex: 0 0 100%;
                 max-width: 100%;
             }
-            
+
             .photo-preview {
                 padding-right: 0;
                 margin-bottom: 20px;
@@ -162,6 +164,7 @@ require_once '../config/db_conn.php';
         }
     </style>
 </head>
+
 <body>
     <div class="d-flex">
         <!-- Sidebar -->
@@ -173,78 +176,6 @@ require_once '../config/db_conn.php';
         <div class="main-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Photos Management</h2>
-                <div class="d-flex">
-                    <div class="search-box me-3">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="form-control" placeholder="Search photos...">
-                    </div>
-                    <div class="filter-dropdown me-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-filter me-2"></i>Filters
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="filterDropdown">
-                            <h6 class="dropdown-header">Photo Status</h6>
-                            <div class="form-check ms-3 mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="filterApproved" checked>
-                                <label class="form-check-label" for="filterApproved">
-                                    Approved
-                                </label>
-                            </div>
-                            <div class="form-check ms-3 mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="filterPending">
-                                <label class="form-check-label" for="filterPending">
-                                    Pending Review
-                                </label>
-                            </div>
-                            <div class="form-check ms-3">
-                                <input class="form-check-input" type="checkbox" value="" id="filterRejected">
-                                <label class="form-check-label" for="filterRejected">
-                                    Rejected
-                                </label>
-                            </div>
-                            <hr>
-                            <h6 class="dropdown-header">Categories</h6>
-                            <div class="form-check ms-3 mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="filterLandscape" checked>
-                                <label class="form-check-label" for="filterLandscape">
-                                    Landscape
-                                </label>
-                            </div>
-                            <div class="form-check ms-3 mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="filterPortrait" checked>
-                                <label class="form-check-label" for="filterPortrait">
-                                    Portrait
-                                </label>
-                            </div>
-                            <div class="form-check ms-3 mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="filterWildlife">
-                                <label class="form-check-label" for="filterWildlife">
-                                    Wildlife
-                                </label>
-                            </div>
-                            <div class="form-check ms-3 mb-2">
-                                <input class="form-check-input" type="checkbox" value="" id="filterStreet">
-                                <label class="form-check-label" for="filterStreet">
-                                    Street
-                                </label>
-                            </div>
-                            <div class="form-check ms-3">
-                                <input class="form-check-input" type="checkbox" value="" id="filterArchitecture">
-                                <label class="form-check-label" for="filterArchitecture">
-                                    Architecture
-                                </label>
-                            </div>
-                            <hr>
-                            <div class="d-flex justify-content-between">
-                                <button class="btn btn-sm btn-outline-danger">Reset</button>
-                                <button class="btn btn-sm btn-primary">Apply</button>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadPhotoModal">
-                        <i class="fas fa-upload me-2"></i>Upload Photo
-                    </button>
-                </div>
             </div>
 
             <div class="card">
@@ -264,20 +195,20 @@ require_once '../config/db_conn.php';
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>                                <?php
-                                // Fetch images with user and category details
-                                $query = "SELECT i.id, i.user_id, i.title, i.description, i.image_url, i.price,
+                            <tbody> <?php
+                                    // Fetch images with user and category details
+                                    $query = "SELECT i.id, i.user_id, i.title, i.description, i.image_url, i.price,
                                         i.is_public, i.created_at, u.name as user_name, u.email,
                                         c.name as category_name 
                                         FROM images i
                                         LEFT JOIN users u ON i.user_id = u.id
                                         LEFT JOIN categories c ON i.category_id = c.id
                                         ORDER BY i.created_at DESC";
-                                $result = $conn->query($query);
+                                    $result = $conn->query($query);
 
-                                if ($result->num_rows > 0) {
-                                    while($row = $result->fetch_assoc()) {
-                                ?>
+                                    if ($result->num_rows > 0) {
+                                        while ($row = $result->fetch_assoc()) {
+                                    ?>
                                         <tr class="image-row" data-image-id="<?php echo $row['id']; ?>">
                                             <td><?php echo $row['id']; ?></td>
                                             <td>
@@ -291,7 +222,7 @@ require_once '../config/db_conn.php';
                                             <td>$<?php echo number_format($row['price'], 2); ?></td>
                                             <td><?php echo htmlspecialchars($row['category_name']); ?></td>
                                             <td>
-                                                <?php if($row['is_public']): ?>
+                                                <?php if ($row['is_public']): ?>
                                                     <span class="badge bg-success rounded-pill">Public</span>
                                                 <?php else: ?>
                                                     <span class="badge bg-warning rounded-pill">Private</span>
@@ -301,27 +232,27 @@ require_once '../config/db_conn.php';
                                             <td>
                                                 <!-- <button class="btn btn-sm btn-outline-primary me-1 view-image">
                                                     <i class="fas fa-eye"></i>
-                                                </button> --> 
-                                                <?php if(!$row['is_public']): ?>   
-                                                <a href="approve_photo.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-outline-success me-1" onclick="return confirm('Are you sure you want to approve this photo?')">
-                                                    <i class="fas fa-check"></i>
-                                                </a>
+                                                </button> -->
+                                                <?php if (!$row['is_public']): ?>
+                                                    <a href="approve_photo.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-outline-success me-1" onclick="return confirm('Are you sure you want to approve this photo?')">
+                                                        <i class="fas fa-check"></i>
+                                                    </a>
                                                 <?php endif; ?>
                                                 <a href="delete_photo.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this photo?')">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </td>
                                         </tr>
-                                        <?php
+                                <?php
+                                        }
+                                    } else {
+                                        echo '<tr><td colspan="7" class="text-center">No iamges found</td></tr>';
                                     }
-                                } else {
-                                    echo '<tr><td colspan="7" class="text-center">No iamges found</td></tr>';
-                                }
                                 ?>
                             </tbody>
                         </table>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -342,18 +273,18 @@ require_once '../config/db_conn.php';
                             <input class="form-control" type="file" id="photoFile" accept="image/*" required>
                             <div class="form-text">Maximum file size: 20MB. Supported formats: JPG, PNG, HEIC</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="photoTitle" class="form-label">Title</label>
                             <input type="text" class="form-control" id="photoTitle" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="photoDescription" class="form-label">Description</label>
                             <textarea class="form-control" id="photoDescription" rows="3" required></textarea>
                             <div class="form-text">Tell the story behind this photo, equipment used, and any special techniques.</div>
                         </div>
-                        
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="photoCategory" class="form-label">Category</label>
@@ -374,13 +305,13 @@ require_once '../config/db_conn.php';
                                 <input type="number" class="form-control" id="photoPrice" min="5" max="500" value="50" required>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="photoTags" class="form-label">Tags</label>
                             <input type="text" class="form-control" id="photoTags" placeholder="landscape, sunset, nature">
                             <div class="form-text">Separate tags with commas (up to 10 tags)</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">EXIF Data</label>
                             <div class="row g-2">
@@ -421,19 +352,22 @@ require_once '../config/db_conn.php';
             document.querySelectorAll('.photo-card').forEach(card => {
                 card.addEventListener('click', function() {
                     const photoId = this.getAttribute('data-photo-id');
-                    
+
                     // Hide the grid and show the details card
                     document.getElementById('photosGrid').classList.add('d-none');
                     document.getElementById('photoDetailsCard').classList.remove('d-none');
-                    
+
                     // In a real application, you would fetch photo details from an API
                     // Here we're just showing the card with the existing data
-                    
+
                     // Scroll to the top of the details card
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
                 });
             });
-            
+
             // Back to photos button
             document.getElementById('backToPhotos').addEventListener('click', function() {
                 document.getElementById('photosGrid').classList.remove('d-none');
@@ -442,4 +376,5 @@ require_once '../config/db_conn.php';
         });
     </script>
 </body>
+
 </html>
