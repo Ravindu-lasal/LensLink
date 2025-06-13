@@ -12,36 +12,17 @@ $response = ['success' => false, 'message' => ''];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     $name = trim($_POST['name']);
-    $email = trim($_POST['email']);
     $newPassword = $_POST['newPassword'];
 
     // Validate inputs
-    if (empty($name) || empty($email)) {
-        $response['message'] = 'Name and email are required';
+    if (empty($name)) {
+        $response['message'] = 'Name is required';
         echo json_encode($response);
         exit;
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $response['message'] = 'Invalid email format';
-        echo json_encode($response);
-        exit;
-    }
-
-    // Check if email is already taken by another user
-    $email_check = $conn->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
-    $email_check->bind_param("si", $email, $user_id);
-    $email_check->execute();
-    if ($email_check->get_result()->num_rows > 0) {
-        $response['message'] = 'Email is already in use';
-        echo json_encode($response);
-        exit;
-    }
-
-    // Start building the update query
-    $sql_parts = ["UPDATE users SET name = ?, email = ?"];
-    $types = "ss";
-    $params = [$name, $email];
+    }    // Start building the update query
+    $sql_parts = ["UPDATE users SET name = ?"];
+    $types = "s";
+    $params = [$name];
 
     // Add password update if provided
     if (!empty($newPassword)) {
