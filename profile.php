@@ -55,8 +55,16 @@ $user_data = $user_stmt->get_result()->fetch_assoc();
                     </span>
                 </div>
                 <div class="flex-grow">
-                    <h1 class="text-2xl font-bold text-gray-800"><?php echo htmlspecialchars($user_data['name']); ?>'s Profile</h1>
-                    <p class="text-gray-600">Member since <?php echo date('F Y', strtotime($user_data['created_at'])); ?></p>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800"><?php echo htmlspecialchars($user_data['name']); ?>'s Profile</h1>
+                            <p class="text-gray-600">Member since <?php echo date('F Y', strtotime($user_data['created_at'])); ?></p>
+                            <p class="text-gray-600"><?php echo htmlspecialchars($user_data['email']); ?></p>
+                        </div>
+                        <button onclick="openEditModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-edit mr-2"></i> Edit Profile
+                        </button>
+                    </div>
                     <?php
                     // Get count of purchased images
                     $count_sql = "SELECT COUNT(*) as total 
@@ -107,7 +115,99 @@ $user_data = $user_stmt->get_result()->fetch_assoc();
         </div>
     </div>
 
-    <?php include 'includes/footer.php' ?>
+    <?php include 'includes/footer.php'; ?>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeEditModal()"></div>
+        <div class="relative max-w-md mx-auto my-8 p-4">
+            <div class="bg-white rounded-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Edit Profile</h2>
+                    <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="editProfileForm" onsubmit="handleEditProfile(event)">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2" for="name">Full Name</label>
+                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user_data['name']); ?>"
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2" for="email">Email</label>
+                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user_data['email']); ?>"
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2" for="newPassword">New Password (leave blank to keep current)</label>
+                        <input type="password" id="newPassword" name="newPassword"
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2" for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    </div>
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button" onclick="closeEditModal()"
+                            class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal() {
+            document.getElementById('editProfileModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editProfileModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function handleEditProfile(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            // Check if passwords match if a new password is being set
+            const newPassword = formData.get('newPassword');
+            const confirmPassword = formData.get('confirmPassword');
+            if (newPassword && newPassword !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            fetch('update_profile.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Profile updated successfully!');
+                        closeEditModal();
+                        window.location.reload();
+                    } else {
+                        alert('Error updating profile: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating profile');
+                });
+        }
+    </script>
 </body>
 
 </html>
