@@ -98,7 +98,7 @@ if ($imageResult && $imageResult->num_rows > 0) {
         </div>
         <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
             <div class="text-center text-white max-w-2xl px-4">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome to PhotoArt</h1>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome to LensLink</h1>
                 <p class="text-xl mb-6">Discover and share beautiful photography from around the world</p>
                 <a href="gallery.php" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-medium inline-block">Browse Gallery</a>
             </div>
@@ -138,8 +138,8 @@ if ($imageResult && $imageResult->num_rows > 0) {
                     <img src="./Images/capture.jpg" alt="About PhotoArt" class="rounded-lg shadow-lg w-full">
                 </div>
                 <div class="md:w-1/2">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-6">About PhotoArt</h2>
-                    <p class="text-gray-600 mb-4">Welcome to PhotoArt, the premier destination for buying and selling high-quality photography. Our platform connects talented photographers with individuals and businesses looking for stunning visuals.</p>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">About LensLink</h2>
+                    <p class="text-gray-600 mb-4">Welcome to LensLink, the premier destination for buying and selling high-quality photography. Our platform connects talented photographers with individuals and businesses looking for stunning visuals.</p>
                     <p class="text-gray-600 mb-6">Whether you need images for commercial projects, personal use, or simply want to appreciate beautiful photography, we have something for everyone. Join our growing community of creatives today!</p>
                     <div class="space-y-4">
                         <div class="flex items-start">
