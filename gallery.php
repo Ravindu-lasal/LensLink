@@ -3,11 +3,37 @@ session_start();
 
 include_once 'config/db_conn.php';
 
-// Fetch all public images
+// Get search and sort parameters
+$search = isset($_GET['search']) ? $_GET['search'] : '';
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
+
+// Base query
 $sql = "SELECT i.*, u.name as photographer FROM images i 
         LEFT JOIN users u ON i.user_id = u.id 
-        WHERE i.is_public = 1 
-        ORDER BY i.created_at DESC";
+        WHERE i.is_public = 1";
+
+// Add search condition if search term is provided
+if (!empty($search)) {
+    $search = $conn->real_escape_string($search);
+    $sql .= " AND (i.title LIKE '%$search%' OR i.description LIKE '%$search%')";
+}
+
+// Add sorting
+switch ($sort) {
+    case 'oldest':
+        $sql .= " ORDER BY i.created_at ASC";
+        break;
+    case 'price-low':
+        $sql .= " ORDER BY i.price ASC";
+        break;
+    case 'price-high':
+        $sql .= " ORDER BY i.price DESC";
+        break;
+    default: // newest
+        $sql .= " ORDER BY i.created_at DESC";
+        break;
+}
+
 $result = $conn->query($sql);
 $images = [];
 
@@ -42,26 +68,28 @@ if ($result && $result->num_rows > 0) {
         <div class="max-w-7xl mx-auto py-8 px-4">
             <h1 class="text-3xl font-bold text-gray-800 mb-4">Photo Gallery</h1>
             <div class="flex flex-wrap items-center justify-between gap-4">
-                <!-- Filter and Sort Controls -->
+                <!-- Sort Controls -->
                 <div class="flex items-center space-x-4">
-                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
-                        <option value="">All Categories</option>
-                        <option value="nature">Nature</option>
-                        <option value="portrait">Portrait</option>
-                        <option value="architecture">Architecture</option>
-                        <option value="travel">Travel</option>
-                    </select>
-                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
+                    <select id="sort" name="sort" onchange="updateFilters()"
+                        class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        <option value="newest" <?php echo $sort === 'newest' ? 'selected' : ''; ?>>Newest First
+                        </option>
+                        <option value="oldest" <?php echo $sort === 'oldest' ? 'selected' : ''; ?>>Oldest First
+                        </option>
+                        <option value="price-low" <?php echo $sort === 'price-low' ? 'selected' : ''; ?>>Price: Low to
+                            High</option>
+                        <option value="price-high" <?php echo $sort === 'price-high' ? 'selected' : ''; ?>>Price: High
+                            to Low</option>
                     </select>
                 </div>
                 <!-- Search Bar -->
                 <div class="relative flex-1 max-w-lg">
-                    <input type="text" placeholder="Search images..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 pl-10">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <form id="searchForm" onsubmit="return false;">
+                        <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>"
+                            placeholder="Search images..." onkeyup="handleSearch(event)"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 pl-10">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </form>
                 </div>
             </div>
         </div>
@@ -114,6 +142,28 @@ if ($result && $result->num_rows > 0) {
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
+
+        let searchTimeout;
+
+        function handleSearch(event) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                updateFilters();
+            }, 500); // Wait for 500ms after user stops typing
+        }
+
+        function updateFilters() {
+            const sort = document.getElementById('sort').value;
+            const search = document.getElementById('search').value;
+
+            // Build the URL with parameters
+            const params = new URLSearchParams();
+            if (sort) params.set('sort', sort);
+            if (search) params.set('search', search);
+
+            // Redirect to the new URL
+            window.location.href = 'gallery.php?' + params.toString();
+        }
     </script>
 </body>
 
