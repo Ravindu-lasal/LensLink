@@ -10,6 +10,16 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Fetch categories
+$category_sql = "SELECT id, name FROM categories ORDER BY name ASC";
+$category_result = $conn->query($category_sql);
+$categories = [];
+if ($category_result && $category_result->num_rows > 0) {
+    while ($row = $category_result->fetch_assoc()) {
+        $categories[] = $row;
+    }
+}
+
 // Simple query to get user's images
 $imgsql = "SELECT * FROM images WHERE user_id = ? ORDER BY created_at DESC";
 
