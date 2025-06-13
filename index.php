@@ -9,7 +9,7 @@ $imageSql = "SELECT i.*, u.name as photographer FROM images i
             LEFT JOIN users u ON i.user_id = u.id 
             WHERE i.is_public = 1 
             ORDER BY i.created_at DESC 
-            LIMIT 3";
+            LIMIT 4";
 $imageResult = $conn->query($imageSql);
 if ($imageResult && $imageResult->num_rows > 0) {
     while ($row = $imageResult->fetch_assoc()) {
