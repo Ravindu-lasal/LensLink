@@ -1,14 +1,12 @@
 <?php
 require_once 'config/db_conn.php';
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Sanitize and collect form input
+if ($_SERVER["REQUEST_METHOD"] === "POST") {    // Sanitize and collect form input
     $firstName = trim($_POST["first-name"]);
     $lastName = trim($_POST["last-name"]);
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
     $confirmPassword = $_POST["confirm-password"];
-    $role = $_POST["role"];
 
     // Combine first and last name
     $fullName = $firstName . ' ' . $lastName;
@@ -97,15 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div>
                         <label for="confirm-password" class="sr-only">Confirm Password</label>
                         <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required
-                            class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                            placeholder="Confirm Password">
-                    </div>
-                    <div class="mt-4">
-                        <label for="role" class="block text-sm text-gray-700 mb-2">Choose your role</label>
-                        <select id="role" name="role" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="seller">Seller</option>
-                            <option value="buyer">Buyer</option>
-                        </select>
+                            class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="Confirm Password">
                     </div>
                 </div>
 
