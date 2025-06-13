@@ -2,17 +2,6 @@
 require_once 'config/db_conn.php';
 session_start();
 
-// Fetch categories
-$categories = [];
-$sql = "SELECT id, name FROM categories ORDER BY name ASC";
-$result = $conn->query($sql);
-
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $categories[] = $row;
-    }
-}
-
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: signin.php');
@@ -21,17 +10,23 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-$imgsql = "SELECT images.*, categories.name AS category_name FROM images 
-        LEFT JOIN categories ON images.category_id = categories.id 
-        WHERE images.user_id = ? ORDER BY created_at DESC";
+// Fetch categories
+$category_sql = "SELECT id, name FROM categories ORDER BY name ASC";
+$category_result = $conn->query($category_sql);
+$categories = [];
+if ($category_result && $category_result->num_rows > 0) {
+    while ($row = $category_result->fetch_assoc()) {
+        $categories[] = $row;
+    }
+}
+
+// Simple query to get user's images
+$imgsql = "SELECT * FROM images WHERE user_id = ? ORDER BY created_at DESC";
 
 $stmt = $conn->prepare($imgsql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
-// Debug information
-echo "<!-- Debug: Number of images found: " . $result->num_rows . " -->";
 
 // Store all results in an array for debugging
 $all_images = [];
@@ -129,30 +124,7 @@ mysqli_data_seek($result, 0);
             ?>
         </div>
 
-        <!-- Search and Filter -->
-        <div class="flex flex-col md:flex-row justify-between mb-8">
-            <div class="relative mb-4 md:mb-0">
-                <input type="text" placeholder="Search images..." class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
-                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
-            </div>
-            <div class="flex space-x-2">
-                <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
-                    <option>All Categories</option>
-                    <option>Nature</option>
-                    <option>Portrait</option>
-                    <option>Travel</option>
-                    <option>Architecture</option>
-                </select>
-                <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
-                    <option>Sort By</option>
-                    <option>Newest</option>
-                    <option>Oldest</option>
-                    <option>Most Popular</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                </select>
-            </div>
-        </div> <!-- Image Grid -->
+        <!-- Image Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <!-- Image Card 1 -->
             <?php
@@ -173,7 +145,6 @@ mysqli_data_seek($result, 0);
                         </button>
                         <div class="text-center p-4">
                             <h3 class="text-white font-bold text-xl mb-2"><?= htmlspecialchars($row['title']) ?></h3>
-                            <p class="text-white text-sm mb-2"><?= htmlspecialchars($row['category_name']) ?></p>
                             <p class="text-white">Lkr <?= number_format($row['price'], 2) ?></p>
                         </div>
                     </div>

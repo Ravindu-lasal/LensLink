@@ -28,7 +28,7 @@
         </li>
     </ul>
     <hr>
-    <div class="dropdown">
+    <div class="dropdown mb-3">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
             <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Admin" class="rounded-circle me-2" width="32" height="32">
             <strong>Admin</strong>
@@ -42,4 +42,8 @@
             <li><a class="dropdown-item" href="../logout.php">Sign out</a></li>
         </ul>
     </div>
+    <!-- Added Logout Button -->
+    <a href="../logout.php" class="btn btn-danger w-100">
+        <i class="fas fa-sign-out-alt me-2"></i>Logout
+    </a>
 </div>

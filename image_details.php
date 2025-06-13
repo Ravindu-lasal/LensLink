@@ -53,7 +53,14 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Fetch related images from the same category
-$related_sql = "SELECT * FROM images WHERE category_id = ? AND id != ? LIMIT 4";
+$related_sql = "SELECT i.*, u.name as photographer_name 
+                FROM images i 
+                LEFT JOIN users u ON i.user_id = u.id 
+                WHERE i.category_id = ? 
+                AND i.id != ? 
+                AND i.is_public = 1 
+                ORDER BY RAND() 
+                LIMIT 4";
 $stmt = $conn->prepare($related_sql);
 $stmt->bind_param("ii", $image['category_id'], $image_id);
 $stmt->execute();
@@ -151,21 +158,22 @@ $related_images = $stmt->get_result();
 
         <!-- Related Images Section -->
         <div class="mt-12">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Related Images</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Related Images</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <?php while ($related_image = $related_images->fetch_assoc()): ?>
-                    <a href="image_details.php?id=<?= $related_image['id'] ?>" class="group">
-                        <div class="relative overflow-hidden rounded-lg shadow-lg">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden group">
+                        <a href="image_details.php?id=<?= $related_image['id'] ?>" class="block relative">
                             <img src="<?= htmlspecialchars($related_image['image_url']) ?>"
                                 alt="<?= htmlspecialchars($related_image['title']) ?>"
-                                class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-300">
-                            <div class="absolute inset-0 bg-black bg-opacity-25 group-hover:bg-opacity-40 transition-opacity duration-300"></div>
-                            <div class="absolute bottom-0 left-0 right-0 p-4 text-white">
-                                <h3 class="text-lg font-semibold truncate"><?= htmlspecialchars($related_image['title']) ?></h3>
-                                <p class="text-sm">Lkr <?= number_format($related_image['price'], 2) ?></p>
+                                class="w-full h-48 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <div class="text-center text-white p-4">
+                                    <h3 class="font-bold mb-2"><?= htmlspecialchars($related_image['title']) ?></h3>
+                                    <p class="text-sm">Lkr <?= number_format($related_image['price'], 2) ?></p>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
                 <?php endwhile; ?>
             </div>
         </div>
